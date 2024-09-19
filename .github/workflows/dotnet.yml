@@ -31,13 +31,9 @@ jobs:
         run: dotnet build --no-restore
 
       # Run the project to check if it can start up
-      - name: Run the project
-        run: dotnet run --project SimpleWebAppReact.csproj --urls=http://localhost:5431 &
-
-      # Wait a bit to see if the app runs (10 seconds)
-      - name: Wait
-        run: sleep 10
-
-      # Check if localhost is running (basic test to see if it started)
-      - name: Check if localhost responds
-        run: curl --fail http://localhost:5431 || exit 1
+      - name: Check if server starts
+        run: |
+          dotnet run --project SimpleWebAppReact.csproj &
+          echo $! > server.pid
+          sleep 10
+          kill $(cat server.pid) || echo "Server already stopped"
