@@ -1,0 +1,48 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: ASP.NET CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checkout the code from your repository
+    - name: Checkout code
+    - uses: actions/checkout@v4
+
+    # Setup .NET Core SDK (for .NET 6)
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 6.0.x
+
+    # Restore dependencies and build project
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore'
+
+    # Run tests (there are none lol)
+    # - name: Test
+    #   run: dotnet test --no-build --verbosity normal
+
+    # Run the project to check if it can start up
+    - name: Run the project
+      run: dotnet run --project SimpleWebAppReact.csproj --urls=http://localhost:5431 &
+  
+    # Wait a bit to see if the app runs (10 seconds)
+    - name: Wait
+      run: sleep 10
+
+    # Check if localhost is running (basic test to see if it started)
+    - name: Check if localhost responds
+      run: curl --fail http://localhost:5431 || exit 1
