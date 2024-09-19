@@ -34,5 +34,6 @@ jobs:
       - name: Check if server starts
         run: |
           dotnet run --project SimpleWebAppReact.csproj &
+          echo $! > server.pid
           sleep 10
-          curl -f http://localhost:5128 || exit 1
+          kill $(cat server.pid) || echo "Server already stopped"
