@@ -35,4 +35,4 @@ jobs:
         run: |
           dotnet run --project SimpleWebAppReact.csproj &
           sleep 10
-          curl -f http://127.0.0.1:5128 || exit 1
+          curl -f http://localhost:5128 || exit 1
