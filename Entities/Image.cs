@@ -1,6 +1,8 @@
 namespace SimpleWebAppReact.Entities;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Libmongocrypt;
+
 /// <summary>
 /// 
 /// </summary>
@@ -11,11 +13,11 @@ public class Image
     public string? Id { get; set; }
     
     [BsonElement("image"), BsonRepresentation(BsonType.Binary)]
-    public string? ImageData { get; set; }
+    public Binary? ImageData { get; set; }
     
     [BsonElement("description"), BsonRepresentation(BsonType.String)]
     public string? Description { get; set; }
 
     [BsonElement("dateTaken"), BsonRepresentation(BsonType.DateTime)]
-    public string? DateTaken { get; set; }
+    public DateTime? DateTaken { get; set; }
 }
