@@ -6,6 +6,10 @@ using MongoDB.Bson.Serialization.Attributes;
 /// </summary>
 public class Events
 {
+    [BsonId]
+    [BsonElement("_id"), BsonRepresentation(BsonType.ObjectId)]
+    public string? Id { get; set; }
+
     [BsonElement("eventName"), BsonRepresentation(BsonType.String)]
     public string? EventName { get; set; }
     
