@@ -25,7 +25,6 @@ namespace SimpleWebAppReact.Controllers
         /// <summary>
         /// gets events, with optional query parameters
         /// </summary>
-
         /// <returns></returns>
         [HttpGet]
         public async Task<IEnumerable<Events>> Get([FromQuery] string? eventName = null, [FromQuery] string? summary = null, [FromQuery] string? content = null, [FromQuery] string? userID = null, [FromQuery] DateTime? date = null, [FromQuery] string? address = null)
@@ -76,6 +75,8 @@ namespace SimpleWebAppReact.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
+
+        //deleted asyn
         public async Task<ActionResult<Events?>> GetById(string id)
         {
             // Simple validation to check if the ID is not null
