@@ -11,20 +11,20 @@ public class Review
     public string? Id { get; set; }
     
     [BsonElement("creator"), BsonRepresentation(BsonType.String)]
-    public string? userId { get; set; }
+    public string? UserId { get; set; }
     
     [BsonElement("description"), BsonRepresentation(BsonType.String)]
-    public string? description { get; set; }
+    public string? Description { get; set; }
 
     [BsonElement("createdAt"), BsonRepresentation(BsonType.DateTime)]
-    public DateTime? createdAt { get; set; } = DateTime.Now;
+    public DateTime? CreatedAt { get; set; } = DateTime.Now;
 
     [BsonElement("rating"), BsonRepresentation(BsonType.Int32)]
-    public int? rating { get; set; }
+    public int? Rating { get; set; }
 
     [BsonElement("likeCount"), BsonRepresentation(BsonType.Int32)]
-    public int? likeCount { get; set; }
+    public int? LikeCount { get; set; }
 
     [BsonElement("dislikeCount"), BsonRepresentation(BsonType.Int32)]
-    public int? dislikeCount { get; set; }
+    public int? DislikeCount { get; set; }
 }
