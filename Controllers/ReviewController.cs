@@ -2,6 +2,7 @@
 using SimpleWebAppReact.Entities;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 using SimpleWebAppReact.Services;
 
 namespace SimpleWebAppReact.Controllers
@@ -30,23 +31,26 @@ namespace SimpleWebAppReact.Controllers
         /// <returns></returns>
         /// </summary>
         [HttpGet]
-        public async Task<ActionResult<Review>> Get([FromQuery] string? sortBy = null, [FromQuery] bool ascending = true)
+        public async Task<ActionResult<Review>> Get([FromQuery] string? sortBy = null, [FromQuery] bool ascending = true, [FromQuery] string? keywords = null)
         {
-            var reviews = _reviews.Find(_ => true);
+            var query = _reviews.AsQueryable();
             
+            if (!string.IsNullOrWhiteSpace(keywords))
+            {
+                query = query.Where(x => keywords.Any(kw => x.Description.Contains(kw)));
+            }
+
             if (!string.IsNullOrWhiteSpace(sortBy))
             {
-                if (sortBy.Equals("CreatedAt", StringComparison.OrdinalIgnoreCase))
+                if (sortBy.Equals("CreatedAt", StringComparison.OrdinalIgnoreCase) && !ascending)
                 {
-                    reviews = ascending
-                        ? reviews.SortBy(review => review.CreatedAt)
-                        : reviews.SortByDescending(review => review.CreatedAt);
+                    query = (IMongoQueryable<Review>) query.Reverse();
                 }
             }
-            
+
             // Fetch the reviews from the database
 
-            return Ok(reviews.ToListAsync());
+            return Ok(query.ToListAsync());
         }
 
         /// <summary>
