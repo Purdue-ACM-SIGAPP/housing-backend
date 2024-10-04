@@ -102,7 +102,7 @@ namespace SimpleWebAppReact.Controllers
             return CreatedAtAction(nameof(GetById), new { id = events.Id }, events);
             
         }
-
+ 
         /// <summary>
         /// updates a events entry
         /// </summary>
