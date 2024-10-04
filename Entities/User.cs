@@ -10,8 +10,8 @@ public class User
     [BsonElement("_id"), BsonRepresentation(BsonType.ObjectId)]
     public string? Id { get; set; }
     
-    [BsonElement("username"), BsonRepresentation(BsonType.String)]
-    public string? Username { get; set; }
+    [BsonElement("name"), BsonRepresentation(BsonType.String)]
+    public string? Name { get; set; }
     
     [BsonElement("phoneNumber"), BsonRepresentation(BsonType.String)]
     public string? PhoneNumber { get; set; }
