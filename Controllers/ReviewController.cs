@@ -23,15 +23,30 @@ namespace SimpleWebAppReact.Controllers
         }
 
         /// <summary>
-        /// gets reviews
+        /// gets reviews, with optional query parameters
+        /// </summary>
+        /// <param name="sortBy"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         /// </summary>
         [HttpGet]
-        public async Task<ActionResult<Review>> Get()
+        public async Task<ActionResult<Review>> Get([FromQuery] string? sortBy = null, [FromQuery] bool ascending = true)
         {
+            var reviews = _reviews.Find(_ => true);
+            
+            if (!string.IsNullOrWhiteSpace(sortBy))
+            {
+                if (sortBy.Equals("CreatedAt", StringComparison.OrdinalIgnoreCase))
+                {
+                    reviews = ascending
+                        ? reviews.SortBy(review => review.CreatedAt)
+                        : reviews.SortByDescending(review => review.CreatedAt);
+                }
+            }
+            
             // Fetch the reviews from the database
-            var reviews = await _reviews.Find(_ => true).ToListAsync();
 
-            return Ok(reviews);
+            return Ok(reviews.ToListAsync());
         }
 
         /// <summary>
