@@ -39,18 +39,19 @@ namespace SimpleWebAppReact.Controllers
             {
                 query = query.Where(x => keywords.Any(kw => x.Description.Contains(kw)));
             }
+            
+            var reviews = await query.ToListAsync();
 
             if (!string.IsNullOrWhiteSpace(sortBy))
             {
                 if (sortBy.Equals("CreatedAt", StringComparison.OrdinalIgnoreCase) && !ascending)
                 {
-                    query = (IMongoQueryable<Review>) query.Reverse();
+                    reviews.Reverse();
                 }
             }
 
             // Fetch the reviews from the database
-
-            return Ok(query.ToListAsync());
+            return Ok(reviews);
         }
 
         /// <summary>
@@ -58,7 +59,7 @@ namespace SimpleWebAppReact.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("{id:int}")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<Review?>> GetById([FromRoute] string id)
         {
             if (!ModelState.IsValid) {
