@@ -39,8 +39,8 @@ namespace SimpleWebAppReact.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<VideoTour?>> GetById([FromRoute] string id)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<VideoTour?>> GetById(string id)
         {
             if (!ModelState.IsValid) {
                 return BadRequest(ModelState);
