@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using SimpleWebAppReact.Services;
+using Microsoft.VisualBasic;
 
 namespace SimpleWebAppReact.Controllers
 {
@@ -108,6 +109,26 @@ namespace SimpleWebAppReact.Controllers
             var filter = Builders<Review>.Filter.Eq(x => x.Id, id);
             await _reviews.DeleteOneAsync(filter);
             return Ok();
+        }
+
+        /// <summary>
+        /// gets the average rating of a building
+        /// </summary>
+        [HttpGet("average/{buildingId}")]
+        public async Task<ActionResult> GetAverageRatingForBuilding(string buildingId)
+        {
+            // get all reviews with matching buildingId
+            var reviews = await _reviews.Find(_ => true).ToListAsync();
+            reviews = reviews.Where(x => x.BuildingId == buildingId).ToList();
+
+            // get the average rating
+            var ratings = reviews.Select(x => x.Rating).ToList();
+            var sum = ratings.Sum();
+            var num = ratings.Capacity;
+            var average = (num == 0) ? 0 : Convert.ToDouble(sum) / num;
+
+            // return average
+            return Ok(average);
         }
     }
 }
