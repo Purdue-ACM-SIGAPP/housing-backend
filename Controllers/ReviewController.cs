@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using SimpleWebAppReact.Services;
+using System.Text.RegularExpressions;
 
 namespace SimpleWebAppReact.Controllers
 {
@@ -33,14 +34,18 @@ namespace SimpleWebAppReact.Controllers
         [HttpGet]
         public async Task<ActionResult<Review>> Get([FromQuery] string? sortBy = null, [FromQuery] bool ascending = true, [FromQuery] string? keywords = null)
         {
-            var query = _reviews.AsQueryable();
+            var reviews = await _reviews.Find(_ => true).ToListAsync();
             
             if (!string.IsNullOrWhiteSpace(keywords))
             {
-                query = query.Where(x => keywords.Any(kw => x.Description.Contains(kw)));
+                // Split keywords into individual words by space (you can change the delimiter if needed)
+                var keywordArray = keywords.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        
+                // Filter reviews by checking if the description contains any of the keywords
+                reviews = reviews.Where(x => keywordArray.Any(kw => 
+                    Regex.IsMatch(x.Description, $".*{kw}.*", RegexOptions.IgnoreCase)
+                )).ToList();
             }
-            
-            var reviews = await query.ToListAsync();
 
             if (!string.IsNullOrWhiteSpace(sortBy))
             {
