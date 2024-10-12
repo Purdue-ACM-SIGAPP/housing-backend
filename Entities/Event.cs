@@ -4,7 +4,7 @@ using MongoDB.Bson.Serialization.Attributes;
 /// <summary>
 /// Class structure matches 1-1 with Building Table in database
 /// </summary>
-public class Events
+public class Event
 {
     [BsonId]
     [BsonElement("_id"), BsonRepresentation(BsonType.ObjectId)]
@@ -19,11 +19,11 @@ public class Events
     [BsonElement("content"), BsonRepresentation(BsonType.String)]
     public string? Content { get; set; }
 
-    [BsonElement("userID"), BsonRepresentation(BsonType.String)]
-    public string? UserID { get; set; }
+    [BsonElement("userId"), BsonRepresentation(BsonType.String)]
+    public string? UserId { get; set; }
 
     [BsonElement("date"), BsonRepresentation(BsonType.DateTime)]
-    public DateTime? Date { get; set; }
+    public DateTime Date { get; set; } = DateTime.Now;
 
     [BsonElement("address"), BsonRepresentation(BsonType.String)]
     public string? Address { get; set; }

@@ -10,16 +10,16 @@ namespace SimpleWebAppReact.Controllers
     /// Defines endpoints for operations relating the Events table
     /// </summary>
     [ApiController]
-    [Route("api/events")]
-    public class EventsController : ControllerBase
+    [Route("api/event")]
+    public class EventController : ControllerBase
     {
-        private readonly ILogger<EventsController> _logger;
-        private readonly IMongoCollection<Events>? _events;
+        private readonly ILogger<EventController> _logger;
+        private readonly IMongoCollection<Event>? _events;
 
-        public EventsController(ILogger<EventsController> logger, MongoDbService mongoDbService)
+        public EventController(ILogger<EventController> logger, MongoDbService mongoDbService)
         {
             _logger = logger;
-            _events = mongoDbService.Database?.GetCollection<Events>("events");
+            _events = mongoDbService.Database?.GetCollection<Event>("event");
         }
 
         /// <summary>
@@ -27,11 +27,11 @@ namespace SimpleWebAppReact.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<IEnumerable<Events>> Get([FromQuery] string? eventName = null, [FromQuery] string? summary = null, [FromQuery] string? content = null, [FromQuery] string? userID = null, [FromQuery] DateTime? date = null, [FromQuery] string? address = null)
+        public async Task<IEnumerable<Event>> Get([FromQuery] string? eventName = null, [FromQuery] string? summary = null, [FromQuery] string? content = null, [FromQuery] string? userID = null, [FromQuery] DateTime? date = null, [FromQuery] string? address = null)
         {
             // Build the filter using a filter builder
-            var filterBuilder = Builders<Events>.Filter;
-            var filter = FilterDefinition<Events>.Empty;
+            var filterBuilder = Builders<Event>.Filter;
+            var filter = FilterDefinition<Event>.Empty;
 
             // Apply the event name filter if the parameter is provided
             if (!string.IsNullOrEmpty(eventName))
@@ -52,7 +52,7 @@ namespace SimpleWebAppReact.Controllers
 
             if (!string.IsNullOrEmpty(userID))
             {
-                filter &= filterBuilder.Eq(b => b.UserID, userID);
+                filter &= filterBuilder.Eq(b => b.UserId, userID);
             }
 
             if (!date.HasValue)
@@ -75,9 +75,8 @@ namespace SimpleWebAppReact.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-
-        //deleted asyn
-        public async Task<ActionResult<Events?>> GetById(string id)
+        
+        public async Task<ActionResult<Event?>> GetById(string id)
         {
             // Simple validation to check if the ID is not null
             if (string.IsNullOrEmpty(id))
@@ -85,7 +84,7 @@ namespace SimpleWebAppReact.Controllers
                 return BadRequest("Invalid ID format.");
             }
             
-            var filter = Builders<Events>.Filter.Eq(x => x.Id, id);
+            var filter = Builders<Event>.Filter.Eq(x => x.Id, id);
             var events = _events.Find(filter).FirstOrDefault();
             return events is not null ? Ok(events) : NotFound();
         }
@@ -93,26 +92,26 @@ namespace SimpleWebAppReact.Controllers
         /// <summary>
         /// adds events entry to table
         /// </summary>
-        /// <param name="events"></param>
+        /// <param name="event"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult> Post(Events events)
+        public async Task<ActionResult> Post(Event @event)
         {
-            await _events.InsertOneAsync(events);
-            return CreatedAtAction(nameof(GetById), new { id = events.Id }, events);
+            await _events.InsertOneAsync(@event);
+            return CreatedAtAction(nameof(GetById), new { id = @event.Id }, @event);
             
         }
 
         /// <summary>
         /// updates a events entry
         /// </summary>
-        /// <param name="events"></param>
+        /// <param name="event"></param>
         /// <returns></returns>
         [HttpPut]
-        public async Task<ActionResult> Update(Events events)
+        public async Task<ActionResult> Update(Event @event)
         {
-            var filter = Builders<Events>.Filter.Eq(x => x.Id, events.Id);
-            await _events.ReplaceOneAsync(filter, events);
+            var filter = Builders<Event>.Filter.Eq(x => x.Id, @event.Id);
+            await _events.ReplaceOneAsync(filter, @event);
             return Ok();
         }
 
@@ -124,7 +123,7 @@ namespace SimpleWebAppReact.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(string id)
         {
-            var filter = Builders<Events>.Filter.Eq(x => x.Id, id);
+            var filter = Builders<Event>.Filter.Eq(x => x.Id, id);
             await _events.DeleteOneAsync(filter);
             return Ok();
         }
