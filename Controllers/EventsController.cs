@@ -5,7 +5,7 @@ using MongoDB.Driver;
 using SimpleWebAppReact.Services;
 
 namespace SimpleWebAppReact.Controllers
-{
+{ 
     /// <summary>
     /// Defines endpoints for operations relating the Events table
     /// </summary>
