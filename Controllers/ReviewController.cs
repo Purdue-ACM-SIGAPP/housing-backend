@@ -27,12 +27,11 @@ namespace SimpleWebAppReact.Controllers
         /// <summary>
         /// gets reviews, with optional query parameters
         /// </summary>
-        /// <param name="sortBy"></param>
-        /// <param name="ascending"></param>
+        /// <param name="mostRecent"></param>
         /// <returns></returns>
         /// </summary>
         [HttpGet]
-        public async Task<ActionResult<Review>> Get([FromQuery] string? sortBy = null, [FromQuery] bool ascending = true, [FromQuery] string? keywords = null)
+        public async Task<ActionResult<Review>> Get([FromQuery] bool mostRecent = true, [FromQuery] string? keywords = null)
         {
             var reviews = await _reviews.Find(_ => true).ToListAsync();
             
@@ -47,12 +46,9 @@ namespace SimpleWebAppReact.Controllers
                 )).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(sortBy))
+            if (mostRecent)
             {
-                if (sortBy.Equals("CreatedAt", StringComparison.OrdinalIgnoreCase) && !ascending)
-                {
-                    reviews.Reverse();
-                }
+                reviews.Reverse();
             }
 
             // Fetch the reviews from the database
