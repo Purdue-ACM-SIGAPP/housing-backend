@@ -30,4 +30,7 @@ public class Review
     
     [BsonElement("buildingId"), BsonRepresentation(BsonType.String)]
     public string? BuildingId { get; set; }
+
+    [BsonElement("categories"), BsonRepresentation(BsonType.String)]
+    public List<string>? Tags { get; set; }
 }

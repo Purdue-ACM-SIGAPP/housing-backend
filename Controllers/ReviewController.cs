@@ -11,6 +11,9 @@ namespace SimpleWebAppReact.Controllers
     /// <summary>
     /// Defines endpoints for operations relating the Review table
     /// </summary>
+    ///Add field for category inside of entity 
+    ///Add function to filter reviews by category
+    ///categories = list of strings 
     [ApiController]
     [Route("api/[controller]")]
     public class ReviewController : ControllerBase
@@ -31,7 +34,7 @@ namespace SimpleWebAppReact.Controllers
         /// <returns></returns>
         /// </summary>
         [HttpGet]
-        public async Task<ActionResult<Review>> Get([FromQuery] bool mostRecent = true, [FromQuery] string? keywords = null)
+        public async Task<ActionResult<Review>> Get([FromQuery] bool mostRecent = true, [FromQuery] string? keywords = null, [FromQuery] List<string>? categories = null)
         {
             var reviews = await _reviews.Find(_ => true).ToListAsync();
             
@@ -45,6 +48,13 @@ namespace SimpleWebAppReact.Controllers
                     Regex.IsMatch(x.Description, $".*{kw}.*", RegexOptions.IgnoreCase)
                 )).ToList();
             }
+
+            if (categories != null && categories.Any())
+            {
+                // Filter reviews by checking if the Tags contain all the specified categories
+                reviews = reviews.Where(x => categories.All(category => x.Tags != null && x.Tags.Contains(category))).ToList();
+            }
+
 
             if (mostRecent)
             {
