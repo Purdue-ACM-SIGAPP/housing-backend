@@ -112,8 +112,12 @@ namespace SimpleWebAppReact.Controllers
         }
 
         /// <summary>
-        /// gets the average rating of a building
+        /// gets the average rating of a building, 
         /// </summary>
+        /// <returns>
+        /// the average rating of the passed buildingId
+        /// or -1 if no ratings exist
+        /// </returns>
         [HttpGet("average/{buildingId}")]
         public async Task<ActionResult> GetAverageRatingForBuilding(string buildingId)
         {
@@ -125,7 +129,7 @@ namespace SimpleWebAppReact.Controllers
             var ratings = reviews.Select(x => x.Rating).ToList();
             var sum = ratings.Sum();
             var num = ratings.Capacity;
-            var average = (num == 0) ? 0 : Convert.ToDouble(sum) / num;
+            var average = (num == 0) ? -1 : Convert.ToDouble(sum) / num;
 
             // return average
             return Ok(average);
