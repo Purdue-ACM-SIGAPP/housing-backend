@@ -40,7 +40,7 @@ namespace SimpleWebAppReact.Controllers
             //TODO: make the images array work
             if (!string.IsNullOrEmpty(images))
             {
-                filter &= filterBuilder.Eq<string>(b => b.Images, images);
+                filter &= filterBuilder.Eq(b => b.Images, images);
             }
             if (!peoplePerBedroom.HasValue)
             {
@@ -56,7 +56,8 @@ namespace SimpleWebAppReact.Controllers
                 filter &= filterBuilder.Eq(b => b.Cost, cost);
             }
             // Apply the address filter if the parameter is provided
-            if (!ObjectId.IsNullOrEmpty(buildingID))
+            //TODO: still need to do
+            if (!ObjectId.(buildingID))
             {
                 filter &= filterBuilder.Eq(b => b.BuildingID, buildingID);
             }
