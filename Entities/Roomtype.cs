@@ -10,6 +10,7 @@ public class Roomtype
     [BsonElement("_id"), BsonRepresentation(BsonType.ObjectId)]
     public string? Id { get; set; }
 
+
     [BsonElement("peoplePerBedroom"), BsonRepresentation(BsonType.Int32)]
     public int? PeoplePerBedroom { get; set; }
 
