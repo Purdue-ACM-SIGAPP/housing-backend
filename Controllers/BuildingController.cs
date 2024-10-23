@@ -4,8 +4,17 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using SimpleWebAppReact.Services;
 
+
+
+
+
+
+
+
+
 namespace SimpleWebAppReact.Controllers
 {
+
     /// <summary>
     /// Defines endpoints for operations relating the Building table
     /// </summary>
