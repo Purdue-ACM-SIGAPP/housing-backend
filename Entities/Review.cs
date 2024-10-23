@@ -22,12 +22,6 @@ public class Review
     [BsonElement("rating"), BsonRepresentation(BsonType.Int32)]
     public int? Rating { get; set; }
 
-    [BsonElement("likeCount"), BsonRepresentation(BsonType.Int32)]
-    public int? LikeCount { get; set; }
-
-    [BsonElement("dislikeCount"), BsonRepresentation(BsonType.Int32)]
-    public int? DislikeCount { get; set; }
-    
     [BsonElement("buildingId"), BsonRepresentation(BsonType.String)]
     public string? BuildingId { get; set; }
 }

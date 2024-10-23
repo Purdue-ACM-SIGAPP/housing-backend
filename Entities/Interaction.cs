@@ -2,9 +2,9 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 /// <summary>
-/// Class structure matches 1-1 with UserReview Table in database
+/// Class structure matches 1-1 with Interaction Table in database
 /// </summary>
-public class UserReview
+public class Interaction
 {
     [BsonId]
     [BsonElement("_id"), BsonRepresentation(BsonType.ObjectId)]
@@ -15,4 +15,7 @@ public class UserReview
     
     [BsonElement("reviewId"), BsonRepresentation(BsonType.String)]
     public string? ReviewId { get; set; }
+    
+    [BsonElement("liked"), BsonRepresentation(BsonType.Boolean)]
+    public bool? Liked { get; set; }
 }
