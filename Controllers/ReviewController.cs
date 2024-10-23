@@ -128,6 +128,11 @@ namespace SimpleWebAppReact.Controllers
             return Ok(reviews);
         }
 
+        /// <summary>
+        /// delete all reviews for the building with the passed buildingId
+        /// </summary>
+        /// <param name="buildingId">he id of the building to delete reviews for</param>
+        /// <returns></returns>
         [HttpDelete("building/{buildingId}")]
         public async Task<ActionResult> DeleteByBuildingId([FromRoute] string buildingId)
         {
@@ -140,6 +145,7 @@ namespace SimpleWebAppReact.Controllers
         /// <summary>
         /// gets the average rating of the building with the passed buildingId
         /// </summary>
+        /// <param name="buildingId">the id of the building to get the average rating for</param>
         /// <returns>
         /// the average rating of the passed buildingId
         /// or -1 if no ratings exist
