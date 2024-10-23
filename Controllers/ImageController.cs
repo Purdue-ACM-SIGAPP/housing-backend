@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using SimpleWebAppReact.Entities;
-using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using SimpleWebAppReact.Services;
-using MongoDB.Libmongocrypt;
+using MongoDB.Bson;
 
 namespace SimpleWebAppReact.Controllers
 {
@@ -26,21 +25,21 @@ namespace SimpleWebAppReact.Controllers
         /// <summary>
         /// gets Images, with optional query parameters
         /// </summary>
-        /// <param name="image"></param>
+        /// <param name="imageData"></param>
         /// <param name="description"></param>
         /// <param name="dateTaken"></param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<IEnumerable<Image>> Get([FromQuery] Binary? image = null, [FromQuery] string? description = null, [FromQuery] DateTime? dateTaken = null)
+        public async Task<IEnumerable<Image>> Get([FromQuery] BsonBinaryData? imageData = null, [FromQuery] string? description = null, [FromQuery] DateTime? dateTaken = null)
         {
             // Build the filter using a filter builder
             var filterBuilder = Builders<Image>.Filter;
             var filter = FilterDefinition<Image>.Empty;
 
             // Apply the image filter if the parameter is provided
-            if (image != null)
+            if (imageData != null)
             {
-                filter &= filterBuilder.Eq(b => b.ImageData, image);
+                filter &= filterBuilder.Eq(b => b.ImageData, imageData);
             }
 
             // Apply the description filter if the parameter is provided
