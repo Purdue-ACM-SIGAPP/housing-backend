@@ -110,5 +110,61 @@ namespace SimpleWebAppReact.Controllers
             await _reviews.DeleteOneAsync(filter);
             return Ok();
         }
+
+        /// <summary>
+        /// gets all reviews of the building with the passed buildingId
+        /// </summary>
+        /// <returns>
+        /// a list of all reviews with the passed buildingId
+        /// </returns>
+        [HttpGet("building/{buildingId}")]
+        public async Task<ActionResult> GetByBuildingId([FromRoute] string buildingId)
+        {
+            // get all reviews with matching buildingId
+            var reviews = await _reviews.Find(_ => true).ToListAsync();
+            reviews = reviews.Where(x => x.BuildingId == buildingId).ToList();
+
+            // return reviews
+            return Ok(reviews);
+        }
+
+        /// <summary>
+        /// delete all reviews for the building with the passed buildingId
+        /// </summary>
+        /// <param name="buildingId">he id of the building to delete reviews for</param>
+        /// <returns></returns>
+        [HttpDelete("building/{buildingId}")]
+        public async Task<ActionResult> DeleteByBuildingId([FromRoute] string buildingId)
+        {
+            // make a filter for all reviews with the passed buildingId and remove filter from database
+            var filter = Builders<Review>.Filter.Eq(x => x.BuildingId, buildingId);
+            await _reviews.DeleteManyAsync(filter);
+            return Ok();
+        }
+
+        /// <summary>
+        /// gets the average rating of the building with the passed buildingId
+        /// </summary>
+        /// <param name="buildingId">the id of the building to get the average rating for</param>
+        /// <returns>
+        /// the average rating of the passed buildingId
+        /// or -1 if no ratings exist
+        /// </returns>
+        [HttpGet("building/average/{buildingId}")]
+        public async Task<ActionResult> GetAverageRatingForBuilding([FromRoute] string buildingId)
+        {
+            // get all reviews with matching buildingId
+            var reviews = await _reviews.Find(_ => true).ToListAsync();
+            reviews = reviews.Where(x => x.BuildingId == buildingId).ToList();
+
+            // get the average rating
+            var ratings = reviews.Select(x => x.Rating).ToList();
+            var sum = ratings.Sum();
+            var num = ratings.Capacity;
+            var average = (num == 0) ? -1 : Convert.ToDouble(sum) / num;
+
+            // return average
+            return Ok(average);
+        }
     }
 }
