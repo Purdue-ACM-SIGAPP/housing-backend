@@ -1,3 +1,4 @@
+using FuzzySharp;
 using Microsoft.AspNetCore.Mvc;
 using SimpleWebAppReact.Entities;
 using Microsoft.Extensions.Logging;
@@ -23,32 +24,37 @@ namespace SimpleWebAppReact.Controllers
         }
 
         /// <summary>
-        /// gets buildings, with optional query parameters
+        /// gets buildings using an approximate search
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="address"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<IEnumerable<Building>> Get([FromQuery] string? name = null, [FromQuery] string? address = null)
+        public async Task<IEnumerable<Building>> Get([FromQuery] string? query = null)
         {
-            // Build the filter using a filter builder
-            var filterBuilder = Builders<Building>.Filter;
+            int FuzzScore(Building building)
+            {
+                return Math.Max(
+                    building.Name == null ? 0 : Fuzz.Ratio(query, building.Name),
+                    building.Acronym == null ? 0 : Fuzz.Ratio(query, building.Acronym)
+                );
+            }
+
             var filter = FilterDefinition<Building>.Empty;
+            var buildings = await _buildings.Find(filter).ToListAsync();
 
-            // Apply the name filter if the parameter is provided
-            if (!string.IsNullOrEmpty(name))
+            if (!string.IsNullOrEmpty(query))
             {
-                filter &= filterBuilder.Eq(b => b.Name, name);
+                buildings.Sort((b1, b2) =>
+                {
+                    var s1 = FuzzScore(b1);
+                    var s2 = FuzzScore(b2);
+
+                    // Sort descending
+                    return -s1.CompareTo(s2);
+                });
             }
 
-            // Apply the address filter if the parameter is provided
-            if (!string.IsNullOrEmpty(address))
-            {
-                filter &= filterBuilder.Eq(b => b.Address, address);
-            }
-
-            // Fetch the buildings from the database using the filter
-            return await _buildings.Find(filter).ToListAsync();
+            return buildings;
         }
 
         /// <summary>
