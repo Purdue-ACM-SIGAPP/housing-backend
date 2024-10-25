@@ -6,6 +6,11 @@ using MongoDB.Bson.Serialization.Attributes;
 /// </summary>
 public class Review
 {
+    // static fields storing definitions of max/min rating values
+    public const short MIN_RATING = 1;
+    public const short MAX_RATING = 10;
+
+    // database elements
     [BsonId]
     [BsonElement("_id"), BsonRepresentation(BsonType.ObjectId)]
     public string? Id { get; set; }

@@ -81,6 +81,13 @@ namespace SimpleWebAppReact.Controllers
         [HttpPost]
         public async Task<ActionResult> Post(Review review)
         {
+            // check validity of raing value
+            if (review.Rating < Review.MIN_RATING || review.Rating > Review.MAX_RATING) {
+                string error = "Error. Ensure rating is between " + Review.MIN_RATING + " and " + Review.MAX_RATING + ".";
+                return BadRequest(error);
+            }
+
+            // add review to database
             await _reviews.InsertOneAsync(review);
             return CreatedAtAction(nameof(GetById), new { id = review.Id }, review);
         }
@@ -93,6 +100,13 @@ namespace SimpleWebAppReact.Controllers
         [HttpPut]
         public async Task<ActionResult> Update(Review review)
         {
+            // check validity of raing value
+            if (review.Rating < Review.MIN_RATING || review.Rating > Review.MAX_RATING) {
+                string error = "Error. Ensure rating is between " + Review.MIN_RATING + " and " + Review.MAX_RATING + ".";
+                return BadRequest(error);
+            }
+
+            // update review
             var filter = Builders<Review>.Filter.Eq(x => x.Id, review.Id);
             await _reviews.ReplaceOneAsync(filter, review);
             return Ok();
