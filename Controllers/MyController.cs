@@ -2,20 +2,24 @@ using Microsoft.AspNetCore.Mvc;
 using Twilio;
 using Twilio.Rest.Verify.V2.Service;
 using dotenv.net;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SimpleWebAppReact.Controllers
-{
+{   
+
     [ApiController]
     [Route("api/[controller]")]
     public class MyController : ControllerBase
     {
         [HttpGet("message")] // Define the route for this action
+        [Authorize]
         public IActionResult GetMessage()
         {
             return Ok(new { message = "Hello from ASP.NET Core!" });
         }
 
         // Send Twillio Verification Email
+
         [HttpGet("send-verification-email")]
         public async Task<IActionResult> SendVerificationEmail()
         {

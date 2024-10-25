@@ -29,7 +29,8 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseCors("AllowAll"); // Enable CORS
-
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
