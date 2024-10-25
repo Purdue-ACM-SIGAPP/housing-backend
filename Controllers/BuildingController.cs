@@ -57,10 +57,10 @@ namespace SimpleWebAppReact.Controllers
                 });
             }
 
-            if (pageLength != null)
+            if (pageLength is > 0)
             {
                 var index = (pageIndex ?? 0) * pageLength.Value;
-                if (index < buildings.Count)
+                if (index >= 0 && index < buildings.Count)
                 {
                     var count = Math.Min(pageLength.Value, buildings.Count - index);
                     buildings = buildings.GetRange(index, count);
