@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 namespace SimpleWebAppReact;
 /// <summary>
 /// runs startup commands, builds front end, CORS
@@ -12,11 +11,14 @@ public class Startup
     /// <param name="configuration"></param>
     public Startup(IConfiguration configuration)
     {
+        Configuration = configuration;
     }
+    public IConfiguration Configuration { get; }  
 
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddControllers();
+        services.AddHttpClient();
 
         // Configure CORS to allow requests from React Native frontend
         services.AddCors(options =>
@@ -35,8 +37,6 @@ public class Startup
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-
         }).AddJwtBearer(options =>
         {
             options.Authority = "https://dev-mkdb0weeluguzopu.us.auth0.com/";
