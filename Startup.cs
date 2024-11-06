@@ -16,6 +16,7 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddControllers();
+        services.AddHttpClient();
 
         // Configure CORS to allow requests from React Native frontend
         services.AddCors(options =>
