@@ -38,7 +38,10 @@ namespace SimpleWebAppReact.Controllers
         /// <param name="query"></param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<IEnumerable<Building>> Get([FromQuery] string? query = null)
+        public async Task<IEnumerable<Building>> Get(
+            [FromQuery] string? query = null,
+            [FromQuery] int? pageLength = null,
+            [FromQuery] int? pageIndex = null)
         {
             int FuzzScore(Building building)
             {
@@ -63,6 +66,20 @@ namespace SimpleWebAppReact.Controllers
                 });
             }
 
+            if (pageLength is > 0)
+            {
+                var index = (pageIndex ?? 0) * pageLength.Value;
+                if (index >= 0 && index < buildings.Count)
+                {
+                    var count = Math.Min(pageLength.Value, buildings.Count - index);
+                    buildings = buildings.GetRange(index, count);
+                }
+                else
+                {
+                    buildings = new List<Building>();
+                }
+            }
+
             return buildings;
         }
 
@@ -79,7 +96,7 @@ namespace SimpleWebAppReact.Controllers
             {
                 return BadRequest("Invalid ID format.");
             }
-            
+
             var filter = Builders<Building>.Filter.Eq(x => x.Id, id);
             var building = _buildings.Find(filter).FirstOrDefault();
             return building is not null ? Ok(building) : NotFound();
@@ -95,7 +112,6 @@ namespace SimpleWebAppReact.Controllers
         {
             await _buildings.InsertOneAsync(building);
             return CreatedAtAction(nameof(GetById), new { id = building.Id }, building);
-            
         }
 
         /// <summary>
@@ -125,4 +141,3 @@ namespace SimpleWebAppReact.Controllers
         }
     }
 }
-
