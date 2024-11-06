@@ -142,7 +142,7 @@ namespace SimpleWebAppReact.Controllers
             return Ok();
         }
 
-
+        [HttpGet("outline")]
         public async Task<ActionResult> GetBuildingOutlineByPoint(
             [FromQuery] double latitude, 
             [FromQuery] double longitude, 
