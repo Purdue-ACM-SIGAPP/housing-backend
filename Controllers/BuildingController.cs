@@ -25,11 +25,13 @@ namespace SimpleWebAppReact.Controllers
     {
         private readonly ILogger<BuildingController> _logger;
         private readonly IMongoCollection<Building>? _buildings;
+        private readonly BuildingOutlineService _buildingOutlineService;
 
-        public BuildingController(ILogger<BuildingController> logger, MongoDbService mongoDbService)
+        public BuildingController(ILogger<BuildingController> logger, MongoDbService mongoDbService,  BuildingOutlineService buildingOutlineService)
         {
             _logger = logger;
             _buildings = mongoDbService.Database?.GetCollection<Building>("building");
+            _buildingOutlineService = buildingOutlineService;
         }
 
         /// <summary>
@@ -139,5 +141,40 @@ namespace SimpleWebAppReact.Controllers
             await _buildings.DeleteOneAsync(filter);
             return Ok();
         }
+
+
+        public async Task<ActionResult> GetBuildingOutlineByPoint(
+            [FromQuery] double latitude, 
+            [FromQuery] double longitude, 
+            [FromQuery] double radius = 0.001) // default radius ~100m
+        {
+            // Define a bounding box around the point
+            double minLat = latitude - radius;
+            double minLon = longitude - radius;
+            double maxLat = latitude + radius;
+            double maxLon = longitude + radius;
+
+            // Retrieve building outlines within the bounding box
+            var buildingOutlines = await _buildingOutlineService.GetBuildingOutline(minLat, minLon, maxLat, maxLon);
+
+            // Print each building outline's coordinates to the console
+            PrintBuildingOutlines(buildingOutlines);
+
+            // Return the building outlines as JSON
+            return Ok(buildingOutlines);
+        }
+        private void PrintBuildingOutlines(List<List<(double Lat, double Lon)>> buildingOutlines)
+        {
+            for (int i = 0; i < buildingOutlines.Count; i++)
+            {
+                Console.WriteLine($"Building {i + 1} Outline:");
+                foreach (var (Lat, Lon) in buildingOutlines[i])
+                {
+                    Console.WriteLine($"    Latitude: {Lat}, Longitude: {Lon}");
+                }
+                Console.WriteLine(); // Blank line between buildings
+            }
+        }
     }
+    
 }
