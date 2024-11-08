@@ -5,14 +5,6 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using SimpleWebAppReact.Services;
 
-
-
-
-
-
-
-
-
 namespace SimpleWebAppReact.Controllers
 {
 
