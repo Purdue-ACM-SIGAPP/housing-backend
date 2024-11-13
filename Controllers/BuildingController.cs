@@ -22,11 +22,12 @@ namespace SimpleWebAppReact.Controllers
         private readonly HttpClient _httpClient;
         private readonly string _googleApiKey = "AIzaSyCzKs4kUhXuPhBxYB2BU0ODXXIUBJnenhA";
 
-        public BuildingController(ILogger<BuildingController> logger, MongoDbService mongoDbService,  BuildingOutlineService buildingOutlineService)
+        public BuildingController(ILogger<BuildingController> logger, MongoDbService mongoDbService,  BuildingOutlineService buildingOutlineService, HttpClient httpClient)
         {
             _logger = logger;
             _buildings = mongoDbService.Database?.GetCollection<Building>("building");
             _buildingOutlineService = buildingOutlineService;
+            _httpClient = httpClient;
         }
 
         /// <summary>
