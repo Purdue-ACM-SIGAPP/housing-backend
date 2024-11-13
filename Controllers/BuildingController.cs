@@ -178,10 +178,21 @@ namespace SimpleWebAppReact.Controllers
             
 
             // Retrieve building outlines within the bounding box
-            var buildingOutlines = await _buildingOutlineService.GetBuildingOutline(latitude, longitude, radius);
+            var outlineTuples = await _buildingOutlineService.GetBuildingOutline(latitude, longitude, radius);
+
+            // convert the returned variable into a object that can be serialized
+            var buildingOutlines = outlineTuples.Select((outline, index) => new BuildingOutline
+            {
+                BuildingID = $"building_{index + 1}", // or a real ID if available
+                Coordinates = outline.Select(coordinate => new Coordinate
+                {
+                    Latitude = coordinate.Lat,
+                    Longitude = coordinate.Lon
+                }).ToList()
+            }).ToList();
 
             // Print each building outline's coordinates to the console
-            PrintBuildingOutlines(buildingOutlines);
+            // PrintBuildingOutlines(buildingOutlines);
 
             // Return the building outlines as JSON
             return Ok(buildingOutlines);
@@ -197,6 +208,19 @@ namespace SimpleWebAppReact.Controllers
                 }
                 Console.WriteLine(); // Blank line between buildings
             }
+        }
+
+        // Private classes for buildingOutline
+        // dotnet's serializer will automatically retain structure of the objects when returning it as JSON
+        private class Coordinate
+        {
+            public double Latitude { get; set; }
+            public double Longitude { get; set; }
+        }
+        private class BuildingOutline
+        {
+            public string BuildingID { get; set; }
+            public List<Coordinate> Coordinates { get; set; }
         }
     }
     
