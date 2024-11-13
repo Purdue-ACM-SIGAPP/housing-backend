@@ -169,22 +169,47 @@ namespace SimpleWebAppReact.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Gets a building's outline, made of coordinates
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="radius"></param>
+        /// <returns></returns>
         [HttpGet("outline")]
         public async Task<ActionResult> GetBuildingOutlineByPoint(
-            [FromQuery] double latitude, 
-            [FromQuery] double longitude, 
+            [FromQuery] string id,
             [FromQuery] double radius = 0.001) // default radius ~100m
         {
-            // Define a bounding box around the point
-            
+            double targetLatitude, targetLongitude;
+
+            // ID is given
+            if (!string.IsNullOrEmpty(id))
+            {
+                // Query the database to get the building coordinates using the building's ID
+                var filter = Builders<Building>.Filter.Eq(x => x.Id, id);
+                var building = _buildings.Find(filter).FirstOrDefault();
+
+                if (building == null)
+                {
+                    return NotFound($"Building with ID {id} not found.");
+                }
+
+                targetLatitude = building.Latitude ?? 0.0;
+                targetLongitude = building.Longitude ?? 0.0;
+            }
+            else
+            {
+                // Return error if id not provided
+                return BadRequest("Either id must be provided.");
+            }
 
             // Retrieve building outlines within the bounding box
-            var outlineTuples = await _buildingOutlineService.GetBuildingOutline(latitude, longitude, radius);
+            var outlineTuples = await _buildingOutlineService.GetBuildingOutline(targetLatitude, targetLongitude, radius);
 
             // convert the returned variable into a object that can be serialized
             var buildingOutlines = outlineTuples.Select((outline, index) => new BuildingOutline
             {
-                BuildingID = $"building_{index + 1}", // or a real ID if available
+                BuildingID = id ?? $"building_{index + 1}",
                 Coordinates = outline.Select(coordinate => new Coordinate
                 {
                     Latitude = coordinate.Lat,
@@ -220,8 +245,8 @@ namespace SimpleWebAppReact.Controllers
         }
         private class BuildingOutline
         {
-            public string BuildingID { get; set; }
-            public List<Coordinate> Coordinates { get; set; }
+            public string BuildingID { get; set; } = string.Empty;
+            public List<Coordinate> Coordinates { get; set; } = new List<Coordinate>();
         }
     }
     
