@@ -33,6 +33,9 @@ public class Review
     [BsonElement("dislikeCount"), BsonRepresentation(BsonType.Int32)]
     public int? DislikeCount { get; set; }
     
+    [BsonElement("flagged"), BsonRepresentation(BsonType.Boolean)]
+    public bool? Flagged { get; set; }
+    
     [BsonElement("buildingId"), BsonRepresentation(BsonType.String)]
     public string? BuildingId { get; set; }
 }
