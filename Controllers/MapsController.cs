@@ -85,5 +85,75 @@ public class MapsController : ControllerBase
             return StatusCode(500, new { message = "Error while calling Google Maps API." });
         }
     }
+    [HttpPost("set-coordinates")]
+    public async Task<IActionResult> SetCoordinates(string buildingId)
+    {
+        if (_buildings == null)
+        {
+            return StatusCode(500, new { message = "Building collection not initialized." });
+        }
+
+        // Fetch the building from the database using its ID
+        var building = await _buildings.Find(b => b.Id == buildingId).FirstOrDefaultAsync();
+
+        if (building == null)
+        {
+            return NotFound(new { message = "Building not found." });
+        }
+
+        // Ensure the address is not null or empty
+        if (string.IsNullOrEmpty(building.Address))
+        {
+            return BadRequest(new { message = "Address is missing for the building." });
+        }
+
+        // Prepare the Geocoding API request
+        string url = $"https://maps.googleapis.com/maps/api/geocode/json?address={building.Address}&key={_googleApiKey}";
+
+        try
+        {
+            // Send the request to Google Maps Geocoding API
+            var response = await _httpClient.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+            var jsonData = JObject.Parse(jsonResponse);
+
+            // Parse coordinates from the response
+            var location = jsonData["results"]?[0]?["geometry"]?["location"];
+            var latitude = location?["lat"]?.ToObject<double>();
+            var longitude = location?["lng"]?.ToObject<double>();
+
+            if (latitude == null || longitude == null)
+            {
+                return BadRequest(new { message = "Could not get coordinates from the address." });
+            }
+
+            // Set the coordinates in the building entity
+            building.Latitude = latitude.Value;
+            building.Longitude = longitude.Value;
+
+            // Update the building in the database
+            var updateResult = await _buildings.ReplaceOneAsync(b => b.Id == buildingId, building);
+
+            if (!updateResult.IsAcknowledged)
+            {
+                return StatusCode(500, new { message = "Failed to update building coordinates in the database." });
+            }
+
+            return Ok(new
+            {
+                message = "Coordinates updated successfully.",
+                buildingId,
+                latitude,
+                longitude
+            });
+        }
+        catch (HttpRequestException e)
+        {
+            _logger.LogError(e, "Error while calling Google Maps API");
+            return StatusCode(500, new { message = "Error while calling Google Maps API." });
+        }
+    }
+
 }
 

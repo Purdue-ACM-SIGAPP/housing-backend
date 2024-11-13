@@ -18,6 +18,8 @@ public class Startup
         services.AddControllers();
         services.AddHttpClient();
 
+        services.AddSingleton<BuildingOutlineService>();
+
         // Configure CORS to allow requests from React Native frontend
         services.AddCors(options =>
         {
