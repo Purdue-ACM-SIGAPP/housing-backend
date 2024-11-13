@@ -14,8 +14,13 @@ public class BuildingOutlineService
     }
 
     // Method to get building outlines with multiple coordinates for diverse polygon shapes
-    public async Task<List<List<(double Lat, double Lon)>>> GetBuildingOutline(double minLat, double minLon, double maxLat, double maxLon)
+    public async Task<List<List<(double Lat, double Lon)>>> GetBuildingOutline(double latitude, double longitude, double radius)
     {
+        double minLat = latitude - radius;
+        double minLon = longitude - radius;
+        double maxLat = latitude + radius;
+        double maxLon = longitude + radius;
+        
         // Overpass API endpoint
         string url = "http://overpass-api.de/api/interpreter";
 

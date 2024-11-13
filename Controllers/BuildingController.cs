@@ -175,13 +175,10 @@ namespace SimpleWebAppReact.Controllers
             [FromQuery] double radius = 0.001) // default radius ~100m
         {
             // Define a bounding box around the point
-            double minLat = latitude - radius;
-            double minLon = longitude - radius;
-            double maxLat = latitude + radius;
-            double maxLon = longitude + radius;
+            
 
             // Retrieve building outlines within the bounding box
-            var buildingOutlines = await _buildingOutlineService.GetBuildingOutline(minLat, minLon, maxLat, maxLon);
+            var buildingOutlines = await _buildingOutlineService.GetBuildingOutline(latitude, longitude, radius);
 
             // Print each building outline's coordinates to the console
             PrintBuildingOutlines(buildingOutlines);
