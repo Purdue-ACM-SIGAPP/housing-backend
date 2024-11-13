@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SimpleWebAppReact.Entities;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using Newtonsoft.Json.Linq;
 using SimpleWebAppReact.Services;
 
 namespace SimpleWebAppReact.Controllers
@@ -18,6 +19,8 @@ namespace SimpleWebAppReact.Controllers
         private readonly ILogger<BuildingController> _logger;
         private readonly IMongoCollection<Building>? _buildings;
         private readonly BuildingOutlineService _buildingOutlineService;
+        private readonly HttpClient _httpClient;
+        private readonly string _googleApiKey = "AIzaSyCzKs4kUhXuPhBxYB2BU0ODXXIUBJnenhA";
 
         public BuildingController(ILogger<BuildingController> logger, MongoDbService mongoDbService,  BuildingOutlineService buildingOutlineService)
         {
@@ -104,6 +107,37 @@ namespace SimpleWebAppReact.Controllers
         [HttpPost]
         public async Task<ActionResult> Post(Building building)
         {
+            // Prepare the Geocoding API request
+            string url = $"https://maps.googleapis.com/maps/api/geocode/json?address={building.Address}&key={_googleApiKey}";
+
+            try
+            {
+                // Send the request to Google Maps Geocoding API
+                var response = await _httpClient.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+                var jsonResponse = await response.Content.ReadAsStringAsync();
+                var jsonData = JObject.Parse(jsonResponse);
+
+                // Parse coordinates from the response
+                var location = jsonData["results"]?[0]?["geometry"]?["location"];
+                var latitude = location?["lat"]?.ToObject<double>();
+                var longitude = location?["lng"]?.ToObject<double>();
+
+                if (latitude == null || longitude == null)
+                {
+                    return BadRequest(new { message = "Could not get coordinates from the address." });
+                }
+
+                // Set the coordinates in the building entity
+                building.Latitude = latitude.Value;
+                building.Longitude = longitude.Value;
+            }
+            catch (HttpRequestException e)
+            {
+                _logger.LogError(e, "Error while calling Google Maps API");
+                return StatusCode(500, new { message = "Error while calling Google Maps API." });
+            }
+            
             await _buildings.InsertOneAsync(building);
             return CreatedAtAction(nameof(GetById), new { id = building.Id }, building);
         }
