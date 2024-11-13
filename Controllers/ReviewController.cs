@@ -180,5 +180,19 @@ namespace SimpleWebAppReact.Controllers
             // return average
             return Ok(average);
         }
+
+        /// <summary>
+        /// Marks a review as flagged
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPost("flag")]
+        public async Task<ActionResult> FlagReview([FromQuery] string id)
+        {
+            var filter = Builders<Review>.Filter.Eq(x => x.Id, id);
+            var builder = new UpdateDefinitionBuilder<Review>();
+            await _reviews.UpdateOneAsync(filter, builder.Set(x => x.Flagged, true));
+            return Ok();
+        }
     }
 }
