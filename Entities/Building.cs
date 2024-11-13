@@ -19,14 +19,10 @@ public class Building
     [BsonElement("address"), BsonRepresentation(BsonType.String)]
     public string? Address { get; set; }
 
-//     <field>: { type: <GeoJSON type> , coordinates: <coordinates> }
-
-
-
-//     location: {
-//         type: "Point",
-//         coordinates: [-73.856077, 40.848447]
-//     }
-//     <field>: [<longitude>, <latitude> ]
+    [BsonElement("latitude"), BsonRepresentation(BsonType.Double)]
+    public double? Latitude { get; set; }
+    
+    [BsonElement("longitude"), BsonRepresentation(BsonType.Double)]
+    public double? Longitude { get; set; }
 
 }
