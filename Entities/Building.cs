@@ -13,6 +13,16 @@ public class Building
     [BsonElement("name"), BsonRepresentation(BsonType.String)]
     public string? Name { get; set; }
     
+    [BsonElement("acronym"), BsonRepresentation(BsonType.String)]
+    public string? Acronym { get; set; }
+
     [BsonElement("address"), BsonRepresentation(BsonType.String)]
     public string? Address { get; set; }
+
+    [BsonElement("latitude"), BsonRepresentation(BsonType.Double)]
+    public double? Latitude { get; set; }
+    
+    [BsonElement("longitude"), BsonRepresentation(BsonType.Double)]
+    public double? Longitude { get; set; }
+
 }
