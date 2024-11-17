@@ -1,5 +1,5 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 namespace SimpleWebAppReact;
-
 /// <summary>
 /// runs startup commands, builds front end, CORS
 /// </summary>
@@ -11,13 +11,14 @@ public class Startup
     /// <param name="configuration"></param>
     public Startup(IConfiguration configuration)
     {
+        Configuration = configuration;
     }
+    public IConfiguration Configuration { get; }  
 
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddControllers();
         services.AddHttpClient();
-
         services.AddSingleton<BuildingOutlineService>();
 
         // Configure CORS to allow requests from React Native frontend
@@ -30,6 +31,20 @@ public class Startup
                        .AllowAnyHeader();
             });
         });
+        services.AddMvc();
+
+        // 1. Add Authentication Services
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        }).AddJwtBearer(options =>
+        {
+            options.Authority = "https://dev-mkdb0weeluguzopu.us.auth0.com/";
+            options.Audience = "http://localhost:5128";
+        });
+
+        services.AddAuthorization();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -45,15 +60,11 @@ public class Startup
         }
 
         app.UseHttpsRedirection();
-        app.UseRouting();
-
         app.UseStaticFiles();
-
-        // Enable CORS
+        app.UseRouting();
         app.UseCors("AllowAll");
-
-        app.UseAuthorization();
-        
+        app.UseAuthentication();
+        app.UseAuthorization();        
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapControllers();
