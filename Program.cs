@@ -1,8 +1,10 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using SimpleWebAppReact;
+using SimpleWebAppReact.Entities;
 using SimpleWebAppReact.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +17,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<MongoDbService>();
+builder.Services.AddIdentity<User, IdentityRole>();
 builder.Services.AddHttpClient<BuildingOutlineService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
