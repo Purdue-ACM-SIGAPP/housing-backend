@@ -8,9 +8,9 @@ using MongoDB.Bson.Serialization.Attributes;
 /// </summary>
 public class User : MongoUser
 {
-    [BsonId]
-    [BsonElement("_id"), BsonRepresentation(BsonType.ObjectId)]
-    public string? Id { get; set; }
+    // [BsonId]
+    // [BsonElement("_id"), BsonRepresentation(BsonType.ObjectId)]
+    // public string? Id { get; set; }
     
     [BsonElement("name"), BsonRepresentation(BsonType.String)]
     public string? Name { get; set; }
