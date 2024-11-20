@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using SimpleWebAppReact;
 using SimpleWebAppReact.Entities;
 using SimpleWebAppReact.Services;
@@ -17,6 +18,45 @@ builder.Logging.AddConsole(); // Enable console logging
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+// Swagger config
+builder.Services.AddSwaggerGen(option =>
+{
+    option.SwaggerDoc("v1", new OpenApiInfo { Title = "Demo API", Version = "v1" });
+
+    option.AddSecurityDefinition("OAuth2", new OpenApiSecurityScheme
+    {
+        Type = SecuritySchemeType.OAuth2,
+        Description = "Auth0 OAuth2 Authorization",
+        Flows = new OpenApiOAuthFlows
+        {
+            AuthorizationCode = new OpenApiOAuthFlow
+            {
+                AuthorizationUrl = new Uri("https://dev-mkdb0weeluguzopu.us.auth0.com/authorize"),
+                TokenUrl = new Uri("https://dev-mkdb0weeluguzopu.us.auth0.com/oauth/token"),
+                Scopes = new Dictionary<string, string>
+                {
+                    { "read:api", "Access the API" } // Define your scopes
+                }
+            }
+        }
+    });
+
+    option.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "OAuth2"
+                }
+            },
+            new[] { "read:api" }
+        }
+    });
+});
+
 builder.Services.AddSingleton<MongoDbService>();
 // Here, configure User
 var connectionString = builder.Configuration.GetConnectionString("DbConnection");
