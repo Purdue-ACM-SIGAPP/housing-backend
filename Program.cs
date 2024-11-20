@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SimpleWebAppReact;
+using SimpleWebAppReact.Entities;
 using SimpleWebAppReact.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -47,6 +48,7 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 builder.Services.AddSingleton<MongoDbService>();
+builder.Services.AddIdentity<User, IdentityRole>();
 builder.Services.AddHttpClient<BuildingOutlineService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
