@@ -1,5 +1,6 @@
 using System.Security.Claims;
-using AspNetCore.Identity.MongoDbCore.Models;
+using AspNetCore.Identity.Mongo;
+using AspNetCore.Identity.Mongo.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -61,14 +62,18 @@ builder.Services.AddSingleton<MongoDbService>();
 // Here, configure User
 var connectionString = builder.Configuration.GetConnectionString("DbConnection");
 var databaseName = builder.Configuration.GetConnectionString("DatabaseName");
-builder.Services.AddIdentity<User, MongoIdentityRole>(options =>
-{
-    options.Password.RequireDigit = true;
-    options.Password.RequireLowercase = true;
-    options.Password.RequireUppercase = true;
-    options.Password.RequireNonAlphanumeric = true;
-    options.Password.RequiredLength = 6;
-}).AddMongoDbStores<User, MongoIdentityRole<string>, string>(connectionString, databaseName);
+
+// At the ConfigureServices section in Startup.cs
+builder.Services.AddIdentityMongoDbProvider<User, MongoRole>(identity =>
+    {
+        identity.Password.RequiredLength = 8;
+        // other options
+    },
+    mongo =>
+    {
+        mongo.ConnectionString = connectionString;
+        // other options
+    });
 
 builder.Services.AddHttpClient<BuildingOutlineService>();
 
