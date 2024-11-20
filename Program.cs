@@ -48,6 +48,7 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 builder.Services.AddSingleton<MongoDbService>();
+// Here
 builder.Services.AddIdentity<User, IdentityRole>();
 builder.Services.AddHttpClient<BuildingOutlineService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
