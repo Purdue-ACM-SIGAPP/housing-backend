@@ -1,3 +1,5 @@
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 public class Room
 {
     public string? Type { get; set; }  
@@ -6,5 +8,9 @@ public class Room
     public double HousingRate {get; set; }
 
     public bool IsSharedBathroom {get; set; }
+
+    [BsonElement("buildingId"), BsonRepresentation(BsonType.ObjectId)]
+
+    public string? BuildingID { get; set; }
 
 }
