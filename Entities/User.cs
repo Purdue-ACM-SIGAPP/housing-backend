@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity;
+using AspNetCore.Identity.MongoDbCore.Models;
 
 namespace SimpleWebAppReact.Entities;
 using MongoDB.Bson;
@@ -6,7 +6,7 @@ using MongoDB.Bson.Serialization.Attributes;
 /// <summary>
 /// Class structure matches 1-1 with User Table in database
 /// </summary>
-public class User : IdentityUser
+public class User : MongoIdentityUser<string>
 {
     [BsonId]
     [BsonElement("_id"), BsonRepresentation(BsonType.ObjectId)]
