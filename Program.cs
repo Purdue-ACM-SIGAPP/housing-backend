@@ -17,6 +17,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<MongoDbService>();
+// Here
 builder.Services.AddIdentity<User, IdentityRole>();
 builder.Services.AddHttpClient<BuildingOutlineService>();
 
