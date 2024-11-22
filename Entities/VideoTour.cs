@@ -13,8 +13,11 @@ public class VideoTour
     [BsonElement("title"), BsonRepresentation(BsonType.String)]
     public string? Title { get; set; }
     
-    [BsonElement("url"), BsonRepresentation(BsonType.String)]
-    public string? Url { get; set; }
+    [BsonElement("fileId"), BsonRepresentation(BsonType.String)]
+    public string? FileId { get; set; }
+    
+    [BsonElement("fileType"), BsonRepresentation(BsonType.String)]
+    public string? FileType { get; set; }
 
     [BsonElement("length"), BsonRepresentation(BsonType.Double)]
     public Double? Length { get; set; }
