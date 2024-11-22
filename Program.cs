@@ -19,9 +19,11 @@ builder.Logging.AddConsole(); // Enable console logging
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddIdentity<IdentityUser, IdentityRole>();
+
 // Swagger config
 builder.Services.AddSwaggerGen(option =>
-{
+{   
     option.SwaggerDoc("v1", new OpenApiInfo { Title = "Demo API", Version = "v1" });
 
     option.AddSecurityDefinition("OAuth2", new OpenApiSecurityScheme
