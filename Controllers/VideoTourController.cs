@@ -115,7 +115,18 @@ namespace SimpleWebAppReact.Controllers
         public async Task<ActionResult> Delete(string id)
         {
             var filter = Builders<VideoTour>.Filter.Eq(x => x.Id, id);
+            var videoTour = (await _videoTours.FindAsync(filter)).FirstOrDefault();
+
+            if (videoTour is null)
+            {
+                return NotFound();
+            }
+            
             await _videoTours.DeleteOneAsync(filter);
+
+            var objectId = ObjectId.Parse(videoTour.FileId);
+            await _videosBucket.DeleteAsync(objectId);
+            
             return Ok();
         }
     }
