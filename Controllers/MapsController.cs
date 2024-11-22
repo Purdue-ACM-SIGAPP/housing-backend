@@ -23,6 +23,62 @@ public class MapsController : ControllerBase
         _buildings = mongoDbService.Database?.GetCollection<Building>("building");
         _httpClient = httpClient;
     }
+
+    [HttpGet("user_distance")]
+    public async Task<IActionResult> GetUserDistance(string buildingId, double latitude, double longitude)
+    {
+        if (_buildings == null)
+        {
+            return StatusCode(500, new { message = "Building collection not initialized." });
+        }
+        
+        // Fetch destination building from database
+        var destBuilding = await _buildings.Find(b => b.Id == buildingId).FirstOrDefaultAsync();
+        if (destBuilding == null)
+        {
+            return NotFound(new { message = "Building not found." });
+        }
+        
+        // Extract address
+        string address = destBuilding.Address ?? string.Empty;
+        if (string.IsNullOrEmpty(address))
+        {
+            return BadRequest(new { message = "Address is not set for building" });
+        }
+        
+        // Prepare request url
+        string requestCoords = $"{latitude},{longitude}";
+        string url = $"https://maps.googleapis.com/maps/api/distancematrix/json?origins={requestCoords}&destinations={address}&units=imperial&key={_googleApiKey}";
+
+        try
+        {
+            var response = await _httpClient.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+            var jsonData = JObject.Parse(jsonResponse);
+
+            // Parse distance and duration from the response
+            var distance = jsonData["rows"]?[0]?["elements"]?[0]?["distance"]?["text"]?.ToString();
+            var duration = jsonData["rows"]?[0]?["elements"]?[0]?["duration"]?["text"]?.ToString();
+
+            if (distance == null || duration == null)
+            {
+                return BadRequest(new { message = "Could not calculate distance or duration." });
+            }
+
+            // Return the distance and duration as the response
+            return Ok(new
+            {
+                distance,
+                duration
+            });
+        }
+        catch (HttpRequestException e)
+        {
+            _logger.LogError(e, "Error while calling Google Maps API");
+            return StatusCode(500, e.Message);
+        }
+    }
     
     [HttpGet("distance")]
     public async Task<IActionResult> GetDistance(string buildingId1, string buildingId2)
