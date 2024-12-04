@@ -69,7 +69,7 @@ namespace SimpleWebAppReact.Controllers
 
             var videoId = ObjectId.Parse(videoTour.FileId);
             await using var downloadStream = await _videosBucket.OpenDownloadStreamAsync(videoId);
-            return File(downloadStream, videoTour.FileType ?? "video/mp4");
+            return File(downloadStream, "video/mp4");
         }
 
         /// <summary>
@@ -78,16 +78,18 @@ namespace SimpleWebAppReact.Controllers
         /// <param name="videoTour"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult> Post(VideoTour videoTour, IFormFile file)
+        public async Task<ActionResult> Post([FromQuery] VideoTour videoTour, IFormFile file)
         {
-            var filename = $"{file.FileName}-${videoTour.Id}";
-            var uploadOptions = new GridFSUploadOptions();
-                
-            await using var fileStream = file.OpenReadStream();
-            var videoId = await _videosBucket.UploadFromStreamAsync(filename, fileStream);
+            if (file.ContentType != "video/mp4")
+            {
+                return BadRequest("File must be an mp4");
+            }
 
-            videoTour.FileId = videoId.ToString();
-            videoTour.FileType = file.Headers.ContentType;
+            var fileStream = file.OpenReadStream();
+            var objectId = await _videosBucket.UploadFromStreamAsync(videoTour.Id, fileStream);
+            fileStream.Close();
+
+            videoTour.FileId = objectId.ToString();
             
             await _videoTours.InsertOneAsync(videoTour);
             return CreatedAtAction(nameof(GetById), new { id = videoTour.Id }, videoTour);

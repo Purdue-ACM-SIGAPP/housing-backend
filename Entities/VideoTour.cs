@@ -15,9 +15,6 @@ public class VideoTour
     
     [BsonElement("fileId"), BsonRepresentation(BsonType.String)]
     public string? FileId { get; set; }
-    
-    [BsonElement("fileType"), BsonRepresentation(BsonType.String)]
-    public string? FileType { get; set; }
 
     [BsonElement("length"), BsonRepresentation(BsonType.Double)]
     public Double? Length { get; set; }
