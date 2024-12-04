@@ -19,7 +19,6 @@ builder.Logging.AddConsole(); // Enable console logging
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddIdentity<IdentityUser, IdentityRole>();
 
 // Swagger config
 builder.Services.AddSwaggerGen(option =>
