@@ -1,4 +1,6 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+/*using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+
 namespace SimpleWebAppReact;
 /// <summary>
 /// runs startup commands, builds front end, CORS
@@ -34,15 +36,16 @@ public class Startup
         services.AddMvc();
 
         // 1. Add Authentication Services
-        services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        }).AddJwtBearer(options =>
-        {
-            options.Authority = "https://dev-mkdb0weeluguzopu.us.auth0.com/";
-            options.Audience = "http://localhost:5128";
-        });
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.Authority = "https://dev-2gowyyl3kin685ua.us.auth0.com/";
+                options.Audience = "http://localhost:5128";
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    RoleClaimType = "https://my-app.example.com/roles" // Match the namespace in your token
+                };
+            });
 
         services.AddAuthorization();
     }
@@ -71,4 +74,4 @@ public class Startup
             endpoints.MapFallbackToFile("/index.html");
         });
     }
-}
+}*/
