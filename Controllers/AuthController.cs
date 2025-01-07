@@ -1,3 +1,7 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using RestSharp;
+
 namespace SimpleWebAppReact.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
@@ -18,34 +22,75 @@ public class AuthController : ControllerBase
         _httpClientFactory = httpClientFactory;
         _configuration = configuration;
     }
-
-    [HttpPost("get-token")]
-    public async Task<IActionResult> GetToken([FromBody] LoginRequest request)
+    
+    
+    [HttpGet("whoami")]
+    [Authorize] // Ensure the user is authenticated
+    public IActionResult GetWho()
     {
-        var client = _httpClientFactory.CreateClient("Okta");
-
-        var body = new StringBuilder();
-        body.Append($"grant_type=password");
-        body.Append($"&username={request.Username}");
-        body.Append($"&password={request.Password}");
-        body.Append($"&scope=openid");
-
-        var content = new StringContent(body.ToString(), Encoding.UTF8, "application/x-www-form-urlencoded");
-
-        var response = await client.PostAsync("v1/token", content);
-
-        if (response.IsSuccessStatusCode)
+        var claims = User.Claims.Select(c => new { c.Type, c.Value });
+        return Ok(new
         {
-            var tokenResponse = await response.Content.ReadAsStringAsync();
-            return Ok(tokenResponse);
+            Message = "User info retrieved successfully.",
+            Claims = claims
+        });
+    }
+    
+    [HttpGet("get-user-id")]
+    [Authorize]
+    public IActionResult GetUserId()
+    {
+        // Retrieve the `NameIdentifier` claim value
+        var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+        if (userId == null)
+        {
+            return Unauthorized(new { Message = "User ID not found in claims." });
         }
 
-        return BadRequest("Failed to retrieve token");
+        return Ok(new
+        {
+            Message = "User ID retrieved successfully.",
+            UserId = userId
+        });
     }
-}
+    [Authorize]
+    [HttpGet("debug-claims")]
+    public IActionResult DebugClaims()
+    {
+        var claims = User.Claims.Select(c => new { c.Type, c.Value }).ToList();
+        return Ok(claims);
+    }
+    [HttpGet("roles")]
+    [Authorize]
+    public IActionResult GetUserRoles()
+    {
+        // Extract roles from the current user's identity
+        var roles = User.Claims
+            .Where(c => c.Type == ClaimTypes.Role) // Use ClaimTypes.Role to fetch role claims
+            .Select(c => c.Value)
+            .ToList();
 
-public class LoginRequest
-{
-    public string Username { get; set; }
-    public string Password { get; set; }
+        if (roles.Count == 0)
+        {
+            return NotFound(new
+            {
+                Message = "No roles found for the user."
+            });
+        }
+
+        return Ok(new
+        {
+            Message = "User roles retrieved successfully.",
+            Roles = roles
+        });
+    }
+    
+    [Authorize(Roles = "test")]
+    [HttpGet("gatekeep-test")]
+    public IActionResult GatekeepTest()
+    {
+        return Ok();
+    }
+
 }

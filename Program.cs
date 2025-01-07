@@ -49,15 +49,37 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddSingleton<MongoDbService>();
 builder.Services.AddHttpClient<BuildingOutlineService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-.AddJwtBearer(options =>
-{
-    options.Authority = "https://dev-2gowyyl3kin685ua.us.auth0.com/";;
-    options.Audience = "http://localhost:5128";
-    options.TokenValidationParameters = new TokenValidationParameters
+    .AddJwtBearer(options =>
     {
-        NameClaimType = ClaimTypes.NameIdentifier
-    };
-});
+        options.Authority = "https://dev-2gowyyl3kin685ua.us.auth0.com/";
+        options.Audience = "http://localhost:5128";
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            NameClaimType = ClaimTypes.NameIdentifier,
+            RoleClaimType = "https://my-app.example.com/roles"
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = async context =>
+            {
+                var claimsIdentity = context.Principal.Identity as ClaimsIdentity;
+                if (claimsIdentity != null)
+                {
+                    // Ensure roles claim is an array of roles, even if there's only one role
+                    var roles = claimsIdentity.FindAll("https://my-app.example.com/roles")
+                        .Select(c => c.Value)
+                        .ToList();
+                    
+                    // Add roles to the claims identity
+                    foreach (var role in roles)
+                    {
+                        claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, role));
+                    }
+                }
+            }
+        };
+    });
 
 builder.Services.AddAuthorization();
 builder.Services.AddSingleton<IAuthorizationHandler, HasScopeHandler>();
