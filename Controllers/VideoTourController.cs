@@ -68,8 +68,15 @@ namespace SimpleWebAppReact.Controllers
             }
 
             var videoId = ObjectId.Parse(videoTour.FileId);
-            await using var downloadStream = await _videosBucket.OpenDownloadStreamAsync(videoId);
-            return File(downloadStream, "video/mp4");
+            var stream = new MemoryStream();
+            await _videosBucket.DownloadToStreamAsync(videoId, stream);
+            stream.Seek(0, SeekOrigin.Begin);
+            var fileInfo = await _videosBucket
+                .Find(Builders<GridFSFileInfo>.Filter.Eq("_id", videoId))
+                .FirstOrDefaultAsync();
+            if (fileInfo == null)
+                return NotFound("File not found.");
+            return File(stream, "video/mp4", fileInfo.Filename);
         }
 
         /// <summary>
@@ -86,7 +93,7 @@ namespace SimpleWebAppReact.Controllers
             }
 
             var fileStream = file.OpenReadStream();
-            var objectId = await _videosBucket.UploadFromStreamAsync(videoTour.Id, fileStream);
+            var objectId = await _videosBucket.UploadFromStreamAsync(videoTour.Title, fileStream);
             fileStream.Close();
 
             videoTour.FileId = objectId.ToString();
