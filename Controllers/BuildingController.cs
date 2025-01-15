@@ -1,4 +1,5 @@
 using FuzzySharp;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SimpleWebAppReact.Entities;
 using Microsoft.Extensions.Logging;
@@ -106,6 +107,7 @@ namespace SimpleWebAppReact.Controllers
         /// <param name="building"></param>
         /// <returns></returns>
         [HttpPost]
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult> Post(Building building)
         {
             // Prepare the Geocoding API request
@@ -149,6 +151,7 @@ namespace SimpleWebAppReact.Controllers
         /// <param name="building"></param>
         /// <returns></returns>
         [HttpPut]
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult> Update(Building building)
         {
             var filter = Builders<Building>.Filter.Eq(x => x.Id, building.Id);
@@ -162,6 +165,7 @@ namespace SimpleWebAppReact.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("{id}")]
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult> Delete(string id)
         {
             var filter = Builders<Building>.Filter.Eq(x => x.Id, id);
