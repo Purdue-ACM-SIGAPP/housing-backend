@@ -248,6 +248,36 @@ namespace SimpleWebAppReact.Controllers
             public string BuildingID { get; set; } = string.Empty;
             public List<Coordinate> Coordinates { get; set; } = new List<Coordinate>();
         }
+
+        [HttpGet("filterByType")]
+        public async Task<IEnumerable<Building>> GetByType(
+            [FromQuery] string type,
+            [FromQuery] string? query = null)
+        {
+            // Ensure type is valid
+            if (type != nameof(DinningCourt) && type != nameof(Housing))
+            {
+                return null;
+            }
+
+            // MongoDB filter for BuildingType
+            var filter = Builders<Building>.Filter.Eq("buildingType", type);
+
+            // Fetch buildings of the given type
+            var buildings = await _buildings.Find(filter).ToListAsync();
+
+            if (!string.IsNullOrEmpty(query))
+            {
+                int FuzzScore(Building building)
+                {
+                    return building.Name == null ? 0 : Fuzz.Ratio(query, building.Name);
+                }
+
+                buildings.Sort((b1, b2) => FuzzScore(b2).CompareTo(FuzzScore(b1)));
+            }
+
+            return buildings;
+        }
     }
     
 }
