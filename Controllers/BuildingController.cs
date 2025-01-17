@@ -107,7 +107,7 @@ namespace SimpleWebAppReact.Controllers
         /// <param name="building"></param>
         /// <returns></returns>
         [HttpPost]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> Post(Building building)
         {
             // Prepare the Geocoding API request
@@ -151,7 +151,7 @@ namespace SimpleWebAppReact.Controllers
         /// <param name="building"></param>
         /// <returns></returns>
         [HttpPut]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> Update(Building building)
         {
             var filter = Builders<Building>.Filter.Eq(x => x.Id, building.Id);
@@ -165,7 +165,7 @@ namespace SimpleWebAppReact.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("{id}")]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> Delete(string id)
         {
             var filter = Builders<Building>.Filter.Eq(x => x.Id, id);
