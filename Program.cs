@@ -70,7 +70,9 @@ builder.Services.AddHttpClient<BuildingOutlineService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.Authority = "https://dev-2gowyyl3kin685ua.us.auth0.com/";
+        options.Authority = builder.Configuration.GetConnectionString("opt_Authority");
+
+        //options.Authority = "https://dev-2gowyyl3kin685ua.us.auth0.com/";
         options.Audience = "http://localhost:5128";
         options.TokenValidationParameters = new TokenValidationParameters
         {
