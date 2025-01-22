@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SimpleWebAppReact.Entities;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using SimpleWebAppReact.Services;
 
@@ -72,13 +73,14 @@ namespace SimpleWebAppReact.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<User?>> GetById(string id)
         {
+            ObjectId objectId = new ObjectId(id);
             // Simple validation to check if the ID is not null
             if (string.IsNullOrEmpty(id))
             {
                 return BadRequest("Invalid ID format.");
             }
             
-            var filter = Builders<User>.Filter.Eq(x => x.Id, id);
+            var filter = Builders<User>.Filter.Eq(x => x.Id, objectId);
             var user = _users.Find(filter).FirstOrDefault();
             return user is not null ? Ok(user) : NotFound();
         }
@@ -117,7 +119,8 @@ namespace SimpleWebAppReact.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(string id)
         {
-            var filter = Builders<User>.Filter.Eq(x => x.Id, id);
+            ObjectId objectId = new ObjectId(id);
+            var filter = Builders<User>.Filter.Eq(x => x.Id, objectId);
             await _users.DeleteOneAsync(filter);
             return Ok();
         }

@@ -1,10 +1,13 @@
 using System.Security.Claims;
+using AspNetCore.Identity.Mongo;
+using AspNetCore.Identity.Mongo.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SimpleWebAppReact;
+using SimpleWebAppReact.Entities;
 using SimpleWebAppReact.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -47,12 +50,28 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 builder.Services.AddSingleton<MongoDbService>();
+// Here, configure User
+var connectionString = builder.Configuration.GetConnectionString("DbConnection");
+var databaseName = builder.Configuration.GetConnectionString("DatabaseName");
+
+// At the ConfigureServices section in Startup.cs
+builder.Services.AddIdentityMongoDbProvider<User, MongoRole>(identity =>
+    {
+        identity.Password.RequiredLength = 8;
+        // other options
+    },
+    mongo =>
+    {
+        mongo.ConnectionString = connectionString;
+        // other options
+    });
+
 builder.Services.AddHttpClient<BuildingOutlineService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.Authority = "https://dev-2gowyyl3kin685ua.us.auth0.com/";
-        options.Audience = "http://localhost:5128";
+        options.Authority = builder.Configuration.GetConnectionString("opt_Authority");
+        options.Audience = builder.Configuration.GetConnectionString("opt_audience");
         options.TokenValidationParameters = new TokenValidationParameters
         {
             NameClaimType = ClaimTypes.NameIdentifier,
