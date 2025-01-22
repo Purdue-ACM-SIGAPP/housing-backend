@@ -100,19 +100,6 @@ namespace SimpleWebAppReact.Controllers
             return building is not null ? Ok(building) : NotFound();
         }
 
-        /// <summary>
-        /// gets list of buildings of a given type
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult<List<T>>> GetByBuildingType<T>() where T : Building
-        {
-            var filter = Builders<Building>.Filter.Eq("_t", typeof(T).Name);
-            var result = await _buildings.Find(filter).ToListAsync();
-            
-            return result is not null ? Ok(result.Cast<T>().ToList()) : NotFound();
-            
-        }
 
         /// <summary>
         /// adds building entry to table
