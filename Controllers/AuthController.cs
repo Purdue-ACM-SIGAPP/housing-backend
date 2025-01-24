@@ -1,13 +1,8 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
-using RestSharp;
+using Microsoft.AspNetCore.Mvc;
 
 namespace SimpleWebAppReact.Controllers;
-
-using Microsoft.AspNetCore.Mvc;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 
 /* A work in progress controller that wraps basic Okta provided endpoints, such as /token. will be only used for development */
 [ApiController]
@@ -83,6 +78,29 @@ public class AuthController : ControllerBase
         {
             Message = "User roles retrieved successfully.",
             Roles = roles
+        });
+    }
+
+    [HttpGet("email")]
+    [Authorize]
+    public IActionResult GetUserEmail()
+    {
+        var email = User.Claims
+            .FirstOrDefault(c => c.Type == ClaimTypes.Email)?
+            .Value;
+
+        if (email == null)
+        {
+            return NotFound(new
+            {
+                Message = "No email found for the user."
+            });
+        }
+
+        return Ok(new
+        {
+            Message = "User email retrieved successfully.",
+            Email = email
         });
     }
     
