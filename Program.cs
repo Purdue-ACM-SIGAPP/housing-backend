@@ -76,6 +76,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     {
                         claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, role));
                     }
+
+                    // Add email
+                    var emailClaim = claimsIdentity.FindFirst("https://my-app.example.com/email");
+                    if (emailClaim != null)
+                    {
+                        claimsIdentity.AddClaim(new Claim(ClaimTypes.Email, emailClaim.Value));
+                    }
                 }
             }
         };
