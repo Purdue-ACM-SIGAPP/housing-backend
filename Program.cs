@@ -2,7 +2,9 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Models;
 using SimpleWebAppReact;
 using SimpleWebAppReact.Services;
@@ -75,6 +77,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     foreach (var role in roles)
                     {
                         claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, role));
+                    }
+
+                    // Add email
+                    var emailClaim = claimsIdentity.FindFirst("https://my-app.example.com/email");
+                    if (emailClaim != null)
+                    {
+                        claimsIdentity.AddClaim(new Claim(ClaimTypes.Email, emailClaim.Value));
                     }
                 }
             }
