@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SimpleWebAppReact.Entities;
 using Microsoft.Extensions.Logging;
@@ -27,6 +28,7 @@ namespace SimpleWebAppReact.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [Authorize(Roles = "Student,ResidentAssistant,GreekLife,Landlord,Admin")]
         public async Task<IEnumerable<Events>> Get([FromQuery] string? eventName = null, [FromQuery] string? summary = null, [FromQuery] string? content = null, [FromQuery] string? userID = null, [FromQuery] DateTime? date = null, [FromQuery] string? address = null)
         {
             // Build the filter using a filter builder
@@ -75,7 +77,7 @@ namespace SimpleWebAppReact.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-
+        [Authorize(Roles = "Student,ResidentAssistant,GreekLife,Landlord,Admin")]
         //deleted asyn
         public async Task<ActionResult<Events?>> GetById(string id)
         {
@@ -96,6 +98,7 @@ namespace SimpleWebAppReact.Controllers
         /// <param name="events"></param>
         /// <returns></returns>
         [HttpPost]
+        [Authorize(Roles = "Student,ResidentAssistant,GreekLife,Landlord,Admin")]
         public async Task<ActionResult> Post(Events events)
         {
             await _events.InsertOneAsync(events);
@@ -109,6 +112,7 @@ namespace SimpleWebAppReact.Controllers
         /// <param name="events"></param>
         /// <returns></returns>
         [HttpPut]
+        [Authorize(Roles = "Student,ResidentAssistant,GreekLife,Landlord,Admin")]
         public async Task<ActionResult> Update(Events events)
         {
             var filter = Builders<Events>.Filter.Eq(x => x.Id, events.Id);
@@ -122,6 +126,7 @@ namespace SimpleWebAppReact.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Student,ResidentAssistant,GreekLife,Landlord,Admin")]
         public async Task<ActionResult> Delete(string id)
         {
             var filter = Builders<Events>.Filter.Eq(x => x.Id, id);
