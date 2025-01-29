@@ -111,6 +111,11 @@ namespace SimpleWebAppReact.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult> Post(Building building)
         {
+            if (building is DinningCourt dinningCourt)
+            {
+                // Handle DinningCourt-specific initialization if necessary
+            }
+
             // Prepare the Geocoding API request
             string url = $"https://maps.googleapis.com/maps/api/geocode/json?address={building.Address}&key={_googleApiKey}";
 
@@ -254,35 +259,138 @@ namespace SimpleWebAppReact.Controllers
             public List<Coordinate> Coordinates { get; set; } = new List<Coordinate>();
         }
 
-        [HttpGet("filterByType")]
-        public async Task<IEnumerable<Building>> GetByType(
+        /// <summary>
+        /// Filters buildings by type and specific criteria, including room-level attributes for Housing.
+        /// </summary>
+        /// <param name="type">The type of building (e.g., Housing, DinningCourt).</param>
+        /// <param name="criteria">A JSON object containing filtering criteria.</param>
+        /// <returns>A filtered list of buildings.</returns>
+        [HttpGet("filter")]
+        public async Task<ActionResult<IEnumerable<Building>>> Filter(
             [FromQuery] string type,
-            [FromQuery] string? query = null)
+            [FromQuery] string? criteria)
         {
-            // Ensure type is valid
-            if (type != nameof(DinningCourt) && type != nameof(Housing))
+            if (string.IsNullOrEmpty(type))
             {
-                return null;
+                return BadRequest("Building type is required.");
             }
 
-            // MongoDB filter for BuildingType
-            var filter = Builders<Building>.Filter.Eq("buildingType", type);
+            // Parse criteria JSON into a dictionary
+            Dictionary<string, object>? filters = null;
+            if (!string.IsNullOrEmpty(criteria))
+            {
+                try
+                {
+                    filters = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(criteria);
+                }
+                catch
+                {
+                    return BadRequest("Invalid criteria format.");
+                }
+            }
 
-            // Fetch buildings of the given type
+            // Base filter for building type
+            var typeFilter = Builders<Building>.Filter.Eq("buildingType", type);
+            var filter = typeFilter;
+
+            // Add additional filters based on criteria
+            if (filters != null)
+            {
+                foreach (var filterKey in filters.Keys)
+                {
+                    switch (filterKey.ToLower())
+                    {
+                        // Filters specific to Housing
+                        case "pianonum":
+                            if (type == nameof(Housing))
+                                filter &= Builders<Building>.Filter.Gte("pianoNum", Convert.ToInt32(filters[filterKey]));
+                            break;
+
+                        case "kitchennum":
+                            if (type == nameof(Housing))
+                                filter &= Builders<Building>.Filter.Gte("kitchenNum", Convert.ToInt32(filters[filterKey]));
+                            break;
+
+                        case "havedinningcourt":
+                            if (type == nameof(Housing))
+                                filter &= Builders<Building>.Filter.Eq("haveDinningCourt", Convert.ToBoolean(filters[filterKey]));
+                            break;
+
+                        case "haveboilermarket":
+                            if (type == nameof(Housing))
+                                filter &= Builders<Building>.Filter.Eq("haveBoilerMarket", Convert.ToBoolean(filters[filterKey]));
+                            break;
+
+                        case "studyspacenum":
+                            if (type == nameof(Housing))
+                                filter &= Builders<Building>.Filter.Gte("studySpaceNum", Convert.ToInt32(filters[filterKey]));
+                            break;
+
+                        // Room-specific filters for Housing
+                        // case "roomcapacity":
+                        //     if (type == nameof(Housing))
+                        //         filter &= Builders<Building>.Filter.ElemMatch<Housing>(h => h.Rooms, r => r.Capacity >= Convert.ToInt32(filters[filterKey]));
+                        //     break;
+
+                        // case "roomcost":
+                        //     if (type == nameof(Housing))
+                        //         filter &= Builders<Building>.Filter.ElemMatch<Housing>(h => h.Rooms, r => r.Cost <= Convert.ToDecimal(filters[filterKey]));
+                        //     break;
+
+                        // case "roomfeatures":
+                        //     if (type == nameof(Housing))
+                        //         filter &= Builders<Building>.Filter.ElemMatch<Housing>(h => h.Rooms, r => r.Features.Contains(filters[filterKey]?.ToString() ?? ""));
+                        //     break;
+
+                        // case "roomhousingrate":
+                        //     if (type == nameof(Housing))
+                        //         filter &= Builders<Building>.Filter.ElemMatch<Housing>(h => h.Rooms, r => r.HousingRate >= Convert.ToDouble(filters[filterKey]));
+                        //     break;
+
+                        // case "roomissharedbathroom":
+                        //     if (type == nameof(Housing))
+                        //         filter &= Builders<Building>.Filter.ElemMatch<Housing>(h => h.Rooms, r => r.IsSharedBathroom == Convert.ToBoolean(filters[filterKey]));
+                        //     break;
+
+                        // Filters specific to DinningCourt
+                        case "acceptsswipes":
+                            if (type == nameof(DinningCourt))
+                                filter &= Builders<Building>.Filter.Eq("acceptsSwipes", Convert.ToBoolean(filters[filterKey]));
+                            break;
+
+                        case "acceptsdiningdollars":
+                            if (type == nameof(DinningCourt))
+                                filter &= Builders<Building>.Filter.Eq("acceptsDiningDollars", Convert.ToBoolean(filters[filterKey]));
+                            break;
+
+                        case "acceptsboilerexpress":
+                            if (type == nameof(DinningCourt))
+                                filter &= Builders<Building>.Filter.Eq("acceptsBoilerExpress", Convert.ToBoolean(filters[filterKey]));
+                            break;
+
+                        case "stabiloptions":
+                            if (type == nameof(DinningCourt))
+                                filter &= Builders<Building>.Filter.AnyEq("stableOptions", filters[filterKey]?.ToString());
+                            break;
+
+                        case "busyhours":
+                            if (type == nameof(DinningCourt))
+                                filter &= Builders<Building>.Filter.AnyEq("busyHours", filters[filterKey]?.ToString());
+                            break;
+
+                        default:
+                            // Ignore unknown filters
+                            break;
+                    }
+                }
+            }
+
+            // Query the database
             var buildings = await _buildings.Find(filter).ToListAsync();
 
-            if (!string.IsNullOrEmpty(query))
-            {
-                int FuzzScore(Building building)
-                {
-                    return building.Name == null ? 0 : Fuzz.Ratio(query, building.Name);
-                }
-
-                buildings.Sort((b1, b2) => FuzzScore(b2).CompareTo(FuzzScore(b1)));
-            }
-
-            return buildings;
+            return Ok(buildings);
         }
+
     }
     
 }

@@ -2,27 +2,28 @@ namespace SimpleWebAppReact.Entities;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 /// <summary>
-/// Class structure matches 1-1 with Building Table in database
+/// Class structure matches 1-1 with the Building table in the database
 /// </summary>
 public class DinningCourt : Building
 {
-    // food options always available at the court (ex/ salad bar, la fonda, deli bar) 
+    // Food options always available at the court (e.g., salad bar, la fonda, deli bar)
     [BsonElement("stableOptions"), BsonRepresentation(BsonType.Array)]
-    public Array? StableOptions { get; set; }
+    public List<string> StableOptions { get; set; }
+
     
-    // whether or not swipes are accepted
+    // Whether or not meal swipes are accepted
     [BsonElement("acceptsSwipes"), BsonRepresentation(BsonType.Boolean)]
     public bool? AcceptsSwipes { get; set; }
     
-    // an array of hours when the location is busiest (strings?) 
+    // An array of hours when the location is busiest
     [BsonElement("busyHours"), BsonRepresentation(BsonType.Array)]
-    public bool? BusyHours { get; set; }
+    public List<string> BusyHours { get; set; } = new();
     
-    // whether or not dining dollars are accepted
+    // Whether or not dining dollars are accepted
     [BsonElement("acceptsDiningDollars"), BsonRepresentation(BsonType.Boolean)]
     public bool? AcceptsDiningDollars { get; set; }
     
-    // whether or not boilerExpress is accepted
+    // Whether or not BoilerExpress is accepted
     [BsonElement("acceptsBoilerExpress"), BsonRepresentation(BsonType.Boolean)]
     public bool? AcceptsBoilerExpress { get; set; }
     

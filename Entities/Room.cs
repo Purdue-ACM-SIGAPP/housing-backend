@@ -2,8 +2,14 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 public class Room
 {
-    public string? Type { get; set; }  
-    public int Capacity { get; set; } 
+    [BsonElement("capacity"), BsonRepresentation(BsonType.Int32)]
+    public int Capacity { get; set; }
+
+    [BsonElement("features")]
+    public List<string> Features { get; set; } = new List<string>();
+
+    [BsonElement("cost"), BsonRepresentation(BsonType.Decimal128)]
+    public decimal Cost { get; set; }
 
     public double HousingRate {get; set; }
 
