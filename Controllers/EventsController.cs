@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SimpleWebAppReact.Entities;
@@ -28,7 +29,7 @@ namespace SimpleWebAppReact.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Authorize(Roles = "Student,ResidentAssistant,GreekLife,Landlord,Admin")]
+        [Authorize]
         public async Task<IEnumerable<Events>> Get([FromQuery] string? eventName = null, [FromQuery] string? summary = null, [FromQuery] string? content = null, [FromQuery] string? userID = null, [FromQuery] DateTime? date = null, [FromQuery] string? address = null)
         {
             // Build the filter using a filter builder
@@ -77,7 +78,7 @@ namespace SimpleWebAppReact.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        [Authorize(Roles = "Student,ResidentAssistant,GreekLife,Landlord,Admin")]
+        [Authorize]
         //deleted asyn
         public async Task<ActionResult<Events?>> GetById(string id)
         {
@@ -98,9 +99,18 @@ namespace SimpleWebAppReact.Controllers
         /// <param name="events"></param>
         /// <returns></returns>
         [HttpPost]
-        [Authorize(Roles = "Student,ResidentAssistant,GreekLife,Landlord,Admin")]
+        [Authorize]
         public async Task<ActionResult> Post(Events events)
         {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            if (userId == null)
+            {
+                return Unauthorized(new { Message = "User ID not found in claims." });
+            }
+
+            events.UserID = userId;
+            
             await _events.InsertOneAsync(events);
             return CreatedAtAction(nameof(GetById), new { id = events.Id }, events);
             
@@ -112,10 +122,30 @@ namespace SimpleWebAppReact.Controllers
         /// <param name="events"></param>
         /// <returns></returns>
         [HttpPut]
-        [Authorize(Roles = "Student,ResidentAssistant,GreekLife,Landlord,Admin")]
+        [Authorize]
         public async Task<ActionResult> Update(Events events)
         {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            if (userId == null)
+            {
+                return Unauthorized(new { Message = "User ID not found in claims." });
+            }
+
             var filter = Builders<Events>.Filter.Eq(x => x.Id, events.Id);
+            
+            var roles = User.Claims
+                .Where(c => c.Type == ClaimTypes.Role) // Use ClaimTypes.Role to fetch role claims
+                .Select(c => c.Value)
+                .ToList();
+            
+            var evt = await _events.Find(filter).FirstOrDefaultAsync();
+
+            if (!roles.Contains(UserType.Admin.ToString()) && !evt.UserID.Equals(userId))
+            {
+                return Unauthorized();
+            }
+            
             await _events.ReplaceOneAsync(filter, events);
             return Ok();
         }
@@ -126,10 +156,30 @@ namespace SimpleWebAppReact.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Student,ResidentAssistant,GreekLife,Landlord,Admin")]
+        [Authorize]
         public async Task<ActionResult> Delete(string id)
         {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            if (userId == null)
+            {
+                return Unauthorized(new { Message = "User ID not found in claims." });
+            }
+
             var filter = Builders<Events>.Filter.Eq(x => x.Id, id);
+            
+            var roles = User.Claims
+                .Where(c => c.Type == ClaimTypes.Role) // Use ClaimTypes.Role to fetch role claims
+                .Select(c => c.Value)
+                .ToList();
+            
+            var evt = await _events.Find(filter).FirstOrDefaultAsync();
+
+            if (!roles.Contains(UserType.Admin.ToString()) && !evt.UserID.Equals(userId))
+            {
+                return Unauthorized();
+            }
+            
             await _events.DeleteOneAsync(filter);
             return Ok();
         }
