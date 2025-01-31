@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SimpleWebAppReact.Entities;
 using Microsoft.Extensions.Logging;
@@ -97,8 +96,6 @@ namespace SimpleWebAppReact.Controllers
         /// <param name="events"></param>
         /// <returns></returns>
         [HttpPost]
-        //roles that can edit events
-        [Authorize(Roles ="RA, Club, Greek Life Officer")]
         public async Task<ActionResult> Post(Events events)
         {
             await _events.InsertOneAsync(events);
@@ -112,8 +109,6 @@ namespace SimpleWebAppReact.Controllers
         /// <param name="events"></param>
         /// <returns></returns>
         [HttpPut]
-        //roles that can edit events
-        [Authorize(Roles ="RA, Club, Greek Life Officer")]
         public async Task<ActionResult> Update(Events events)
         {
             var filter = Builders<Events>.Filter.Eq(x => x.Id, events.Id);
@@ -127,8 +122,6 @@ namespace SimpleWebAppReact.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("{id}")]
-        //roles that can edit events
-        [Authorize(Roles ="RA, Club, Greek Life Officer")]
         public async Task<ActionResult> Delete(string id)
         {
             var filter = Builders<Events>.Filter.Eq(x => x.Id, id);
