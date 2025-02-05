@@ -29,7 +29,6 @@ namespace SimpleWebAppReact.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Authorize]
         public async Task<IEnumerable<Events>> Get([FromQuery] string? eventName = null, [FromQuery] string? summary = null, [FromQuery] string? content = null, [FromQuery] string? userID = null, [FromQuery] DateTime? date = null, [FromQuery] string? address = null)
         {
             // Build the filter using a filter builder
@@ -78,7 +77,6 @@ namespace SimpleWebAppReact.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        [Authorize]
         //deleted asyn
         public async Task<ActionResult<Events?>> GetById(string id)
         {
@@ -99,7 +97,7 @@ namespace SimpleWebAppReact.Controllers
         /// <param name="events"></param>
         /// <returns></returns>
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Student,ResidentAssistant,GreekLife,Admin")]
         public async Task<ActionResult> Post(Events events)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
@@ -122,7 +120,7 @@ namespace SimpleWebAppReact.Controllers
         /// <param name="events"></param>
         /// <returns></returns>
         [HttpPut]
-        [Authorize]
+        [Authorize(Roles = "Student,ResidentAssistant,GreekLife,Admin")]
         public async Task<ActionResult> Update(Events events)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
@@ -156,7 +154,7 @@ namespace SimpleWebAppReact.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Student,ResidentAssistant,GreekLife,Admin")]
         public async Task<ActionResult> Delete(string id)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
