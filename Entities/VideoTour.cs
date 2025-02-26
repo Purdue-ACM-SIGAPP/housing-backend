@@ -30,4 +30,7 @@ public class VideoTour
 
     [BsonElement("buildingId"), BsonRepresentation(BsonType.String)]
     public string? BuildingId { get; set; }
+    
+    [BsonElement("image"), BsonRepresentation(BsonType.String)]
+    public string? Image { get; set; }
 }
