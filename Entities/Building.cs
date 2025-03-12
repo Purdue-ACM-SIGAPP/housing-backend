@@ -24,5 +24,7 @@ public class Building
     
     [BsonElement("longitude"), BsonRepresentation(BsonType.Double)]
     public double? Longitude { get; set; }
-
+    
+    [BsonElement("image"), BsonRepresentation(BsonType.String)]
+    public string? Image { get; set; }
 }
