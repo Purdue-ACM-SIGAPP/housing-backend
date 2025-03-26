@@ -89,6 +89,32 @@ namespace SimpleWebAppReact.Controllers
             await _videoTours.DeleteOneAsync(filter);
             return Ok();
         }
+
+        /// <summary>
+        /// adds a picture to a videoTour entry
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        [HttpPost("{id}")]
+        public async Task<ActionResult> UploadImage(string id, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest();
+            }
+            
+            using var ms = new MemoryStream();
+            await file.CopyToAsync(ms);
+            string base64Image = Convert.ToBase64String(ms.ToArray());
+            
+            var filter = Builders<VideoTour>.Filter.Eq(v => v.Id, id);
+            var update = Builders<VideoTour>.Update.Set(v => v.Image, base64Image);
+
+            var result = await _videoTours.UpdateOneAsync(filter, update);
+    
+            return result.ModifiedCount > 0 ? Ok() : NotFound();
+        }
     }
 }
 
