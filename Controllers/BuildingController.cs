@@ -391,7 +391,6 @@ namespace SimpleWebAppReact.Controllers
 
             return Ok(buildings);
         }
-
         
         /// <summary>
         /// adds a picture to a videoTour entry

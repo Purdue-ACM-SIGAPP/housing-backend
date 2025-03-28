@@ -7,15 +7,8 @@ using MongoDB.Bson.Serialization.Attributes;
 /// Class structure matches 1-1 with Building Table in database
 /// </summary>
 
-public enum BuildingTypeCode
-{
-    [BsonRepresentation(BsonType.String)]
-    Housing = 'H',
-    DinningCourt = 'D'
-}
-
-[BsonDiscriminator(RootClass = true)]
-[BsonKnownTypes(typeof(Housing), typeof(DinningCourt))]
+//[BsonDiscriminator(RootClass = true)]
+// [BsonKnownTypes(typeof(Housing), typeof(DinningCourt))]
 public class Building
 {
     [BsonId]
@@ -42,6 +35,6 @@ public class Building
 
     //D - dining court; H - housing
     [BsonElement("buildingType"), BsonRepresentation(BsonType.String)]
-    public BuildingTypeCode? BuildingType { get; set; }
+    public string? BuildingType { get; set; }
 
 }
