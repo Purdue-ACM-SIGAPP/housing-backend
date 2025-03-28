@@ -282,6 +282,7 @@ namespace SimpleWebAppReact.Controllers
                 try
                 {
                     filters = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(criteria);
+                    Console.WriteLine(filters);
                 }
                 catch
                 {

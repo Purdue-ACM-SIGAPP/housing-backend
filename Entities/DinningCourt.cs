@@ -4,8 +4,10 @@ using MongoDB.Bson.Serialization.Attributes;
 /// <summary>
 /// Class structure matches 1-1 with the Building table in the database
 /// </summary>
+
 public class DinningCourt : Building
 {
+    
     // Food options always available at the court (e.g., salad bar, la fonda, deli bar)
     [BsonElement("stableOptions"), BsonRepresentation(BsonType.Array)]
     public List<string> StableOptions { get; set; }
