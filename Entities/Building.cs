@@ -1,9 +1,14 @@
 namespace SimpleWebAppReact.Entities;
+
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+
 /// <summary>
 /// Class structure matches 1-1 with Building Table in database
 /// </summary>
+
+//[BsonDiscriminator(RootClass = true)]
+// [BsonKnownTypes(typeof(Housing), typeof(DinningCourt))]
 public class Building
 {
     [BsonId]
@@ -27,4 +32,9 @@ public class Building
     
     [BsonElement("image"), BsonRepresentation(BsonType.String)]
     public string? Image { get; set; }
+
+    //D - dining court; H - housing
+    [BsonElement("buildingType"), BsonRepresentation(BsonType.String)]
+    public string? BuildingType { get; set; }
+
 }
