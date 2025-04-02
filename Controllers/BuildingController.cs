@@ -39,6 +39,7 @@ namespace SimpleWebAppReact.Controllers
         [HttpGet]
         public async Task<IEnumerable<Building>> Get(
             [FromQuery] string? query = null,
+            [FromQuery] int? scoreThreshold = null,
             [FromQuery] int? pageLength = null,
             [FromQuery] int? pageIndex = null)
         {
@@ -63,6 +64,11 @@ namespace SimpleWebAppReact.Controllers
                     // Sort descending
                     return -s1.CompareTo(s2);
                 });
+
+                if (scoreThreshold is > 0)
+                {
+                    buildings = buildings.Where(b => FuzzScore(b) >= scoreThreshold.Value).ToList();
+                }
             }
 
             if (pageLength is > 0)
