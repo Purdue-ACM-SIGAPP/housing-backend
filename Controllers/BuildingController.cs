@@ -67,7 +67,7 @@ namespace SimpleWebAppReact.Controllers
 
                 if (scoreThreshold is > 0)
                 {
-                    buildings = buildings.Where(b => FuzzScore(b) >= scoreThreshold.Value);
+                    buildings = buildings.Where(b => FuzzScore(b) >= scoreThreshold.Value).ToList();
                 }
             }
 
