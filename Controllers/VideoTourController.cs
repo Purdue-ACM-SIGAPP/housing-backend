@@ -96,7 +96,7 @@ namespace SimpleWebAppReact.Controllers
         /// <param name="id"></param>
         /// <param name="file"></param>
         /// <returns></returns>
-        [HttpPost("{id}")]
+        [HttpPost("uploadImage/{id}")]
         public async Task<ActionResult> UploadImage(string id, IFormFile file)
         {
             if (file == null || file.Length == 0)
