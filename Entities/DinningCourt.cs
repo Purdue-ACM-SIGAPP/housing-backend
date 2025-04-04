@@ -7,7 +7,10 @@ using MongoDB.Bson.Serialization.Attributes;
 
 public class DinningCourt : Building
 {
-    
+    public DinningCourt()
+    {
+        BuildingType = "D";
+    }
     // Food options always available at the court (e.g., salad bar, la fonda, deli bar)
     [BsonElement("stableOptions"), BsonRepresentation(BsonType.Array)]
     public List<string> StableOptions { get; set; }

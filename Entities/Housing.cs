@@ -8,6 +8,10 @@ using System.Collections.Generic;
 /// </summary>
 public class Housing : Building
 {
+    public Housing()
+    {
+        BuildingType = "R";
+    }
     // List of room objects, each storing attributes such as cost, capacity, and features
     [BsonElement("rooms")]
     public List<Room> Rooms { get; set; } = new List<Room>();
