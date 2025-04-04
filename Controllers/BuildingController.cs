@@ -259,23 +259,79 @@ namespace SimpleWebAppReact.Controllers
             public List<Coordinate> Coordinates { get; set; } = new List<Coordinate>();
         }
 
-    public async Task<List<Building>> GetHousing()
+    public async Task<List<Housing>> GetFilteredHousingBuildings(
+        bool? hasDiningCourt = null,
+        bool? hasBoilerMarket = null,
+        int? minStudySpaces = null,
+        int? minKitchenNum = null,
+        int? minPianoNum = null)
     {
         var allBuildings = await Get();
-        var housing = allBuildings
+        var housingList = allBuildings
             .Where(b => b.BuildingType == "R")
+            .Select(b => b as Housing)
+            .Where(h => h != null)
             .ToList();
-        return housing;
+        if (hasDiningCourt.HasValue)
+            housingList = housingList
+                .Where(h => h.HaveDinningCourt == hasDiningCourt.Value)
+                .ToList();
+                
+        if (hasBoilerMarket.HasValue)
+            housingList = housingList
+                .Where(h => h.HaveBoilerMarket == hasBoilerMarket.Value)
+                .ToList();
+
+        if (minStudySpaces.HasValue)
+            housingList = housingList
+                .Where(h => h.StudySpaceNum >= minStudySpaces.Value)
+                .ToList();
+
+        if (minKitchenNum.HasValue)
+            housingList = housingList
+                .Where(h => h.KitchenNum >= minKitchenNum.Value)
+                .ToList();
+
+        if (minPianoNum.HasValue)
+            housingList = housingList
+                .Where(h => h.PianoNum >= minPianoNum.Value)
+                .ToList();
+
+        return housingList;
     }
-    public async Task<List<Building>> GetDining()
+
+    public async Task<List<DinningCourt>> GetFilteredDiningCourts(
+        bool? acceptsSwipes = null,
+        bool? acceptsDiningDollars = null,
+        bool? acceptsBoilerExpress = null)
     {
         var allBuildings = await Get();
-        var dining = allBuildings
+        var diningCourts = allBuildings
             .Where(b => b.BuildingType == "D")
+            .Select(b => b as DinningCourt) 
+            .Where(dc => dc != null)
             .ToList();
-        return dining;
+        if (acceptsSwipes.HasValue)
+        {
+            diningCourts = diningCourts
+                .Where(dc => dc.AcceptsSwipes == acceptsSwipes.Value)
+                .ToList();
+        }
+        if (acceptsDiningDollars.HasValue)
+        {
+            diningCourts = diningCourts
+                .Where(dc => dc.AcceptsDiningDollars == acceptsDiningDollars.Value)
+                .ToList();
+        }
+        if (acceptsBoilerExpress.HasValue)
+        {
+            diningCourts = diningCourts
+                .Where(dc => dc.AcceptsBoilerExpress == acceptsBoilerExpress.Value)
+                .ToList();
+        }
+        return diningCourts;
     }
-       
+
         /// <summary>
         /// adds a picture to a videoTour entry
         /// </summary>
