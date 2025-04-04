@@ -7,8 +7,6 @@ using MongoDB.Bson.Serialization.Attributes;
 /// Class structure matches 1-1 with Building Table in database
 /// </summary>
 
-//[BsonDiscriminator(RootClass = true)]
-// [BsonKnownTypes(typeof(Housing), typeof(DinningCourt))]
 public class Building
 {
     [BsonId]
