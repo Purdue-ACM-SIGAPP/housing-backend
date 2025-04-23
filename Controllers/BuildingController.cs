@@ -265,6 +265,7 @@ namespace SimpleWebAppReact.Controllers
             public List<Coordinate> Coordinates { get; set; } = new List<Coordinate>();
         }
 
+[HttpGet("filteredHousing")]
     public async Task<List<Housing>> GetFilteredHousingBuildings(
         bool? hasDiningCourt = null,
         bool? hasBoilerMarket = null,
@@ -306,6 +307,7 @@ namespace SimpleWebAppReact.Controllers
         return housingList;
     }
 
+[HttpGet("filteredDiningCourts")]
     public async Task<List<DinningCourt>> GetFilteredDiningCourts(
         bool? acceptsSwipes = null,
         bool? acceptsDiningDollars = null,
